@@ -1,10 +1,8 @@
 //#include "stdafx.h"
-#include "stdafx.h"
+
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
-
-
 #include "./SqliteOperator.h"
 
 
@@ -286,7 +284,7 @@ void CSqliteDb::Open(const wchar_t* dbPath)
 	if(_db_impl)
 		_db_impl->sub_ref();
 
-	SAFE_DELETE(_db_impl);
+	if (_db_impl)   delete _db_impl;
 	_db_impl = new SqliteDbImpl(dbPath);
 }
 
@@ -312,7 +310,7 @@ CSqliteDb::~CSqliteDb()
 	if ( _db_impl != NULL )
 	{
 		_db_impl->sub_ref();
-		SAFE_DELETE(_db_impl);
+		if (_db_impl)   delete _db_impl;
 	}
 }
 

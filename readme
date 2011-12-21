@@ -8,3 +8,12 @@
 **/
 
 1. 
+/**
+** 源文件： SqliteOperator.h, SqliteOperator.cpp, SqliteOperatorTest.cpp
+** 功能说明：
+** 封装sqlite原生的数据库操作API。可以简便完成执行SQL语句，操作包括创建，插入，更新，删除，查询数据等。
+** 详细见下面类型CSqliteOperator的定义。还定义其他的sqlite辅助类型，包括数据库类型，事务类型，锁类型。
+
+** 作者：junkun huang  e-mail：huangjunkun@gmail.com
+** 日期：2011-12-02 /
+*/

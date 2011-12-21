@@ -11,8 +11,21 @@
 
 #include "sqlite/sqlite3.h"
 
+/**
+** 源文件： SqliteOperator.h, SqliteOperator.cpp, SqliteOperatorTest.cpp
+** 功能说明：
+** 封装sqlite原生的数据库操作API。可以简便完成执行SQL语句，操作包括创建，插入，更新，删除，查询数据等。
+** 详细见下面类型CSqliteOperator的定义。还定义其他的sqlite辅助类型，包括数据库类型，事务类型，锁类型。
+
+** 作者：junkun huang  e-mail：huangjunkun@gmail.com
+** 日期：2011-12-02 /
+*/
+
+/// sqlite 原生类型声明。数据操作状态与数据对象。
 struct sqlite3_stmt;
 struct sqlite3;
+
+/// 辅助类型CSqliteDb的实现。
 class SqliteDbImpl
 {
 public:
@@ -31,6 +44,8 @@ private:
 	int _error_code;
 };
 
+/// 辅助类型，抽象原生sqlite对象。
+/// TODO：实现临时数据库，即内存数据库！
 class CSqliteDb
 {
 private:
@@ -59,6 +74,11 @@ public:
 	int _error_code;
 };
 
+/// sqlite操作类型，包含基本的sqlite数据操作。主要功能包含如下：
+/// 1. 绑定sql语句包含的可变参数；
+/// 2. 编译sql语句，准备执行；
+/// 3. 执行sql语句，区分查询与其他操作。区分点为是否改变数据库。
+/// 4. 还有，一些数据常用属性的访问。
 class CSqliteOperator
 {
 public:
@@ -137,6 +157,7 @@ protected:
 	//LOG_CLS_DEC();
 };
 
+/// 封装sqlite事务对象类型，作用于简便提交事务操作！
 class AutoTransaction
 {
 public:
@@ -148,6 +169,7 @@ private:
 	sqlite3* m_db_ptr;
 };
 
+/// 封装sqlite互斥对象类型，作用于数据库操作时加锁解锁！
 class CSqliteMutex
 {
 	/**
@@ -207,6 +229,9 @@ public:
 					break;
 			} while (true);
 		}
+#else
+	#error "not implement"
+
 #endif
 		return false;
 // 		if (_mutex)
