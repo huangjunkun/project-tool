@@ -20,7 +20,9 @@
 #include <ctime>
 #include <clocale>
 
-//#include <Windows.h>
+#if defined(WIN32) || defined(_WIN32)
+#include <windows.h>
+#endif
 
 #pragma   warning(disable:4127)
 /**
@@ -113,7 +115,7 @@ static inline string_t localtime2str()
 // 	::GetLocalTime(&st);
 // 	char_t buffer[128];
 // 	_stprintf(buffer,_T("%04u-%02u-%02u %02u:%02u:%02u [%u]\r"), st.wYear,st.wMonth,st.wDay,st.wHour ,st.wMinute,st.wSecond);
-// 
+//
 // 	return buffer;
 	struct tm *nowtime;
 	time_t timer;
@@ -127,18 +129,29 @@ static inline string_t localtime2str()
 	return buffer;
 }
 
+static inline int cur_thread_id()
+{
+#if defined(WIN32) || defined(_WIN32)
+//#include <windows.h>
+    return GetCurrentThreadId();
+#elif defined(LINUX) || defined(_LINUX)
+    return gettid();
+#else
+    return 0;
+#endif
+}
 //#define LOG
-#if defined(_DEBUG) || defined(XLTRACE) //LOG//
+#ifdef _DEBUG
 #ifndef __COUT_FOR_LOG_
 #define __COUT_FOR_LOG_
 
-#define cout_trace(msg) do { tcout << _T("[TRACE][") << localtime2str() << _T("]") << __FUNCTION__ << _T("(") << __LINE__ << _T(")") << msg << "\n"; } while(0)
-#define cout_debug(msg) do { tcout  << _T("[DEBUG][") << localtime2str() << _T("]") << __FUNCTION__ << _T("(") << __LINE__ << _T(")") << msg << "\n"; } while(0)
-#define cout_info(msg)  do { tcout  << _T("[INFO][") << localtime2str() << _T("]") << __FUNCTION__ << _T("(") << __LINE__ << _T(")" << msg << "\n"; } while(0)
+#define cout_trace(msg) do { tcout << _T("[TRACE][") << localtime2str() << _T("][") << cur_thread_id() << _T("]") << __FUNCTION__ << _T("(") << __LINE__ << _T(")") << msg << "\n"; } while(0)
+#define cout_debug(msg) do { tcout << _T("[DEBUG][") << localtime2str() << _T("][") << cur_thread_id() << _T("]") << __FUNCTION__ << _T("(") << __LINE__ << _T(")") << msg << "\n"; } while(0)
+#define cout_info(msg)  do { tcout << _T("[INFO][") << localtime2str() << _T("][") << cur_thread_id() << _T("]") << __FUNCTION__ << _T("(") << __LINE__ << _T(")" << msg << "\n"; } while(0)
 
-#define cout_trace2(outs, msg) do { outs << _T("[TRACE][") << localtime2str() << _T("]") << __FUNCTION__ << _T("(") << __LINE__ << _T(")") << msg << "\n"; } while(0)
-#define cout_debug2(outs, msg) do { outs << _T("[DEBUG][") << localtime2str() << _T("]") << __FUNCTION__ << _T("(") << __LINE__ << _T(")") << msg << "\n"; } while(0)
-#define cout_info2(outs, msg)  do { outs << _T("[INFO][") << localtime2str() << _T("]") << __FUNCTION__ << _T("(") << __LINE__ << _T(")") << msg << "\n"; } while(0)
+#define cout_trace2(outs, msg) do { outs << _T("[TRACE][") << localtime2str() << _T("][") << cur_thread_id() << _T("]") << __FUNCTION__ << _T("(") << __LINE__ << _T(")") << msg << "\n"; outs.flush(); } while(0)
+#define cout_debug2(outs, msg) do { outs << _T("[DEBUG][") << localtime2str() << _T("][") << cur_thread_id() << _T("]") << __FUNCTION__ << _T("(") << __LINE__ << _T(")") << msg << "\n"; outs.flush(); } while(0)
+#define cout_info2(outs, msg)  do { outs << _T("[INFO][") << localtime2str() << _T("][") << cur_thread_id() << _T("]") << __FUNCTION__ << _T("(") << __LINE__ << _T(")") << msg << "\n"; outs.flush(); } while(0)
 
 #define assert_false_notify(msg) do { const bool msg(false); assert(msg); } while(0)
 #endif // end __COUT_FOR_LOG_
@@ -342,7 +355,7 @@ namespace junkun
 // 			va_end(arg_ptr);
 // 			return w_bytes;
 // 		}
-// 
+//
 // 		int scanf(const wchar_t * format, ...)
 // 		{
 // 			assert (_file);
@@ -394,7 +407,7 @@ namespace junkun
 			const unsigned BUFFER_SIZE = 64;
 			string_t tmp;
 			tmp.reserve(BUFFER_SIZE);
-			do 
+			do
 			{
 				tmp.clear();
 				char_t buf[BUFFER_SIZE] = {0};
