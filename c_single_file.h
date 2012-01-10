@@ -366,7 +366,7 @@ namespace junkun
 // 			return w_bytes;
 // 		}
 
-		int setmode(int mode) { _setmode(_fileno(_file), mode); }
+		int setmode(int mode) { return _setmode(_fileno(_file), mode); }
 		//int getmode(int mode) { getmode(_fileno(_file)); }
 
 		int eof() { assert (_file); return feof(_file); }
