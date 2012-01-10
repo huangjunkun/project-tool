@@ -40,7 +40,7 @@
 5.
 
 /**
-** 源文件： timer_class.h, timer_class_test.cpp
+** 源文件： win32_timer_class.h, win32_timer_class_test.cpp
 ** 封装WIN定时器操作API，抽象实现timer类型，方便使用。
 **
 ** 作者：junkun huang  e-mail：huangjunkun@gmail.com
@@ -50,7 +50,7 @@
 4.
 
 /**
-** 源文件： thread_class.h, thrad_class_test.cpp
+** 源文件： win32_thread_class.h, win32_thrad_class_test.cpp
 ** 功能描述：封装WIN线程API，抽象实现线程基类thread_base。
 ** 方便用于定制具体操作的线程子类。
 **
