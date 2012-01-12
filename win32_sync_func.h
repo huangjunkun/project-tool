@@ -371,7 +371,7 @@ struct mutex_dtor
 };
 struct mutex_locker
 {
-    bool operator() (HANDLE hHandle, DWORD dwMilliseconds)//
+    int operator() (HANDLE hHandle, DWORD dwMilliseconds)//
     {
         return ::WaitForSingleObject(hHandle, dwMilliseconds);
     }
@@ -388,6 +388,29 @@ struct mutex_unlocker
 typedef win_sync_functor<mutex_space::mutex_ctor, mutex_space::mutex_dtor, mutex_space::mutex_locker, mutex_space::mutex_unlocker> mutex2;
 
 /// implement event2 critical_section2, semaphore2 -->>  the same as mutex ....
+// ... ...
+
+int wait_for_locker(locker& lock, unsigned wat_ms = INFINITE)
+{
+    assert(lock.is_valid());
+    return ::WaitForSingleObject(lock.handle(), wat_ms);
+}
+
+int wait_for_locker(vector<locker*> locks, bool is_wait_all, unsigned wat_ms = INFINITE)
+{
+    if (locks.empty())
+        return 0;
+
+    vector<HANDLE> handles;
+    handles.resize(locks.size());
+    for (unsigned i=0; i < handles.size(); ++i)
+    {
+        assert (locks[i]->is_valid());
+        handles[i] = locks[i]->handle();
+    }
+
+    return ::WaitForMultipleObjects(handles.size(), handles.data(), is_wait_all, wat_ms);
+}
 
 /// -- create and destory --- ///
 static inline locker* create_locker(const string_t& name, int num)
