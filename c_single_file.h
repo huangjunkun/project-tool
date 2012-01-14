@@ -41,13 +41,21 @@ namespace junkun
 /**
 ** 说明： 一些CRT的宏定义，配置用于多语言_UNICODE程序版本。
 */
-	using namespace std;
+using namespace std;
 
 #ifdef _UNICODE
 
 #define atoi_t		_wtoi
 #define itoa_t		_itow
 #define strlen_t	wcslen
+#define strcat_t	wcscat
+#define strset_t	wcsset
+#define strstr_t	wcsstr
+#define strcpy_t	wcscpy
+#define strchr_t	wcschr
+#define strspn_t	wcsspn
+#define strcsp_t	wcscspn
+
 #define fgets_t		fgetws
 #define fputs_t		fputws
 #define fscanf_t	fwscanf
@@ -62,11 +70,23 @@ namespace junkun
 #define char_t		wchar_t
 #define ofstream_t	std::wofstream
 #define ostringstream_t	std::wostringstream
+#define memset_t	wmemset
+#define memcmp_t	wmemcmp
+#define memcpy_t	wmemcpy
+#define memchr_t	wmemchr
 #else
 
 #define atoi_t		atoi
 #define itoa_t		_itoa
 #define strlen_t	strlen
+#define strcat_t	strcat
+#define strset_t	strset
+#define strstr_t	strstr
+#define strcpy_t	strcpy
+#define strchr_t	strchr
+#define strspn_t	strspn
+#define strcsp_t	strcspn
+
 #define fgets_t		fgets
 #define fputs_t		fputs
 #define printf_t	printf
@@ -81,6 +101,10 @@ namespace junkun
 #define char_t		char
 #define ofstream_t	std::ofstream
 #define ostringstream_t	std::ostringstream
+#define memset_t	memset
+#define memcmp_t	memcmp
+#define memcpy_t	memcpy
+#define memchr_t	memchr
 
 #endif
 
@@ -106,27 +130,27 @@ const unsigned CHAR_LOWER_UPPER_CHANGE_FACTOR = _T('z') - _T('a');
 #define toupper_t(ch) (islower_t(ch) ? ((ch) - CHAR_LOWER_UPPER_CHANGE_FACTOR) : (ch))
 //#define toupper_t(ch) isalpha_t(ch) ? (isupper_t(ch) ? (ch) : (ch + CHAR_LOWER_UPPER_CHANGE_FACTOR)) : (ch)
 #endif
-	//
-	//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 static inline string_t localtime2str()
 {
-	/// #include <windows.h>
+    /// #include <windows.h>
 // 	SYSTEMTIME st;
 // 	::GetLocalTime(&st);
 // 	char_t buffer[128];
 // 	_stprintf(buffer,_T("%04u-%02u-%02u %02u:%02u:%02u [%u]\r"), st.wYear,st.wMonth,st.wDay,st.wHour ,st.wMinute,st.wSecond);
 //
 // 	return buffer;
-	struct tm *nowtime;
-	time_t timer;
-	time(&timer);
-	nowtime = localtime(&timer);
-	char_t buffer[128] = {0};
-	if (nowtime)
-		sprintf_t(buffer, _T("%04u-%02u-%02u %02u:%02u:%02u"), nowtime->tm_year+1900, nowtime->tm_mon+1, nowtime->tm_mday,
-		nowtime->tm_hour, nowtime->tm_min, nowtime->tm_sec);
+    struct tm *nowtime;
+    time_t timer;
+    time(&timer);
+    nowtime = localtime(&timer);
+    char_t buffer[128] = {0};
+    if (nowtime)
+        sprintf_t(buffer, _T("%04u-%02u-%02u %02u:%02u:%02u"), nowtime->tm_year+1900, nowtime->tm_mon+1, nowtime->tm_mday,
+                  nowtime->tm_hour, nowtime->tm_min, nowtime->tm_sec);
 
-	return buffer;
+    return buffer;
 }
 
 static inline int cur_thread_id()
@@ -186,154 +210,155 @@ namespace junkun
 #define SPACE_TCHAR		_T(' ')
 #define TAB_TCHAR		_T('\t')
 #define RETURN_TCHAR	_T('\n')
-	using namespace std;
+using namespace std;
 
-	template <typename _TChar>
-	basic_string<_TChar>  trim_tstring(const basic_string<_TChar>& srcString)
-	{//
-		if (srcString.empty())
-			return basic_string<_TChar>();
+template <typename _TChar>
+basic_string<_TChar>  trim_tstring(const basic_string<_TChar>& srcString)
+{
+    //
+    if (srcString.empty())
+        return basic_string<_TChar>();
 
-		typename basic_string<_TChar>::const_iterator citer = srcString.begin();
-		for (; citer != srcString.end(); ++citer)
-			if (!(*citer == _TChar(SPACE_TCHAR) || *citer == _TChar(TAB_TCHAR)))
-				break;
+    typename basic_string<_TChar>::const_iterator citer = srcString.begin();
+    for (; citer != srcString.end(); ++citer)
+        if (!(*citer == _TChar(SPACE_TCHAR) || *citer == _TChar(TAB_TCHAR)))
+            break;
 
-		typename basic_string<_TChar>::const_reverse_iterator criter = srcString.rbegin();
-		for (; criter != srcString.rend(); ++criter)
-			if (!(*citer == _TChar(SPACE_TCHAR) || *citer == _TChar(TAB_TCHAR)))
-				break;
-		typename basic_string<_TChar>::const_iterator end_pos(criter.base());
+    typename basic_string<_TChar>::const_reverse_iterator criter = srcString.rbegin();
+    for (; criter != srcString.rend(); ++criter)
+        if (!(*citer == _TChar(SPACE_TCHAR) || *citer == _TChar(TAB_TCHAR)))
+            break;
+    typename basic_string<_TChar>::const_iterator end_pos(criter.base());
 
-		return basic_string<_TChar>(citer, end_pos);
-	}
+    return basic_string<_TChar>(citer, end_pos);
+}
 
 /**
 ** 类型： c_single_file
 ** 功能： 封装CRT基本的文件读写操作。方便使用。
 */
-	class c_single_file
-	{
-	public:
-		//		using namespace std;
-	public:
-		c_single_file() : _file(0) {}
-		c_single_file(const std::string& filename, const std::string& open_mode="wb+")
-			: _file(0)
-		{
-			if ( !open(filename, open_mode))
-			{
-				assert_false_notify (c_single_file_open_return_false);
-				//throw std::logic_error("c_single_file_open_return_false");
-			}
-		}
-		c_single_file(const std::wstring& filename, const std::wstring& open_mode=L"wb+")
-			: _file(0)
-		{
-			if ( !open(filename, open_mode))
-			{
-				assert_false_notify (c_single_file_open_return_false);
-				//throw std::logic_error("c_single_file_open_return_false");
-			}
-		}
+class c_single_file
+{
+public:
+    //		using namespace std;
+public:
+    c_single_file() : _file(0) {}
+    c_single_file(const std::string& filename, const std::string& open_mode="wb+")
+        : _file(0)
+    {
+        if ( !open(filename, open_mode))
+        {
+            assert_false_notify (c_single_file_open_return_false);
+            //throw std::logic_error("c_single_file_open_return_false");
+        }
+    }
+    c_single_file(const std::wstring& filename, const std::wstring& open_mode=L"wb+")
+        : _file(0)
+    {
+        if ( !open(filename, open_mode))
+        {
+            assert_false_notify (c_single_file_open_return_false);
+            //throw std::logic_error("c_single_file_open_return_false");
+        }
+    }
 
-		~c_single_file()
-		{
-			close();
-		}
-		// member function
-		bool open(const std::string& filename, const std::string& open_type="rb+")
-		{
-			_file = fopen(filename.c_str(), open_type.c_str());
-			return (NULL != _file) ;
-		}
+    ~c_single_file()
+    {
+        close();
+    }
+    // member function
+    bool open(const std::string& filename, const std::string& open_type="rb+")
+    {
+        _file = fopen(filename.c_str(), open_type.c_str());
+        return (NULL != _file) ;
+    }
 
-		bool open(const std::wstring& filename, const std::wstring& open_type=L"rb+")
-		{
-			_file = _wfopen(filename.c_str(), open_type.c_str());
-			return (NULL != _file) ;
-		}
+    bool open(const std::wstring& filename, const std::wstring& open_type=L"rb+")
+    {
+        _file = _wfopen(filename.c_str(), open_type.c_str());
+        return (NULL != _file) ;
+    }
 
-		size_t write(void* pData,size_t len)
-		{
-			assert(_file);
-			return fwrite(pData, 1, len, _file);
-		}
+    size_t write(void* pData,size_t len)
+    {
+        assert(_file);
+        return fwrite(pData, 1, len, _file);
+    }
 
-		size_t read(void* pData,size_t len)
-		{
-			assert(_file);
-			return fread(pData, 1, len, _file);
-		}
+    size_t read(void* pData,size_t len)
+    {
+        assert(_file);
+        return fread(pData, 1, len, _file);
+    }
 
-		bool close()
-		{
-			if (_file)
-			{
-				int res = fclose(_file);
-				_file = NULL;
-				return (0==res);
-			}
-			return false;
-		}
+    bool close()
+    {
+        if (_file)
+        {
+            int res = fclose(_file);
+            _file = NULL;
+            return (0==res);
+        }
+        return false;
+    }
 
-		int flush()
-		{
-			assert (_file);
-			return fflush(_file);
-		}
-		char* gets(char* c_str, unsigned len) const
-		{
-			assert (_file);
-			return fgets(c_str, len, _file);
-		}
-		wchar_t* gets(wchar_t* c_str, unsigned len) const
-		{
-			assert (_file);
-			return fgetws(c_str, len, _file);
-		}
-		int puts(const char* c_str)
-		{
-			assert (_file);
-			return fputs(c_str, _file);
-		}
-		int puts(const wchar_t* c_str)
-		{
-			assert (_file);
-			return fputws(c_str, _file);
-		}
+    int flush()
+    {
+        assert (_file);
+        return fflush(_file);
+    }
+    char* gets(char* c_str, unsigned len) const
+    {
+        assert (_file);
+        return fgets(c_str, len, _file);
+    }
+    wchar_t* gets(wchar_t* c_str, unsigned len) const
+    {
+        assert (_file);
+        return fgetws(c_str, len, _file);
+    }
+    int puts(const char* c_str)
+    {
+        assert (_file);
+        return fputs(c_str, _file);
+    }
+    int puts(const wchar_t* c_str)
+    {
+        assert (_file);
+        return fputws(c_str, _file);
+    }
 
-		int printf(const char * format, ...)
-		{
-			assert (_file);
-			va_list arg_ptr;
-			va_start(arg_ptr, format);
-			int w_bytes = vfprintf(_file, format, arg_ptr);
-			va_end(arg_ptr);
-			return w_bytes;
-		}
+    int printf(const char * format, ...)
+    {
+        assert (_file);
+        va_list arg_ptr;
+        va_start(arg_ptr, format);
+        int w_bytes = vfprintf(_file, format, arg_ptr);
+        va_end(arg_ptr);
+        return w_bytes;
+    }
 
-		int printf(const wchar_t * format, ...)
-		{
-			assert (_file);
-			va_list arg_ptr;
-			va_start(arg_ptr, format);
-			int w_bytes = vfwprintf(_file, format, arg_ptr);
-			va_end(arg_ptr);
-			return w_bytes;
-		}
+    int printf(const wchar_t * format, ...)
+    {
+        assert (_file);
+        va_list arg_ptr;
+        va_start(arg_ptr, format);
+        int w_bytes = vfwprintf(_file, format, arg_ptr);
+        va_end(arg_ptr);
+        return w_bytes;
+    }
 
-		int seek(long offset, int origin)
-		{
-			assert (_file);
-			return fseek(_file, offset, origin);
-		}
+    int seek(long offset, int origin)
+    {
+        assert (_file);
+        return fseek(_file, offset, origin);
+    }
 
-		unsigned tell() const
-		{
-			assert (_file);
-			return ftell(_file);
-		}
+    unsigned tell() const
+    {
+        assert (_file);
+        return ftell(_file);
+    }
 
 // 		int seek(__int64 offset, int origin)
 // 		{
@@ -366,64 +391,82 @@ namespace junkun
 // 			return w_bytes;
 // 		}
 
-		int setmode(int mode) { return _setmode(_fileno(_file), mode); }
-		//int getmode(int mode) { getmode(_fileno(_file)); }
+    int setmode(int mode)
+    {
+        return _setmode(_fileno(_file), mode);
+    }
+    //int getmode(int mode) { getmode(_fileno(_file)); }
 
-		int eof() { assert (_file); return feof(_file); }
-		int error() { assert (_file); return ferror(_file); }
-		bool is_opened() const { return NULL != _file; }
-		FILE* file_ptr() { return _file; }
+    int eof()
+    {
+        assert (_file);
+        return feof(_file);
+    }
+    int error()
+    {
+        assert (_file);
+        return ferror(_file);
+    }
+    bool is_opened() const
+    {
+        return NULL != _file;
+    }
+    FILE* file_ptr()
+    {
+        return _file;
+    }
 //////////////////////////////////////////////////////////////////////////
-		int to_begin()
-		{
-			return seek(0, SEEK_SET);
-			//return rewind(_file);
-		}
-		int to_end()
-		{
-			return seek(0, SEEK_END);
-		}
+    int to_begin()
+    {
+        return seek(0, SEEK_SET);
+        //return rewind(_file);
+    }
+    int to_end()
+    {
+        return seek(0, SEEK_END);
+    }
 
-		int get_int()
-		{
-			char_t buf[128];
-			char_t* io_ret = gets(buf, sizeof(buf));
-			assert (io_ret);
-			int ret = 0;
-			if (io_ret)
-			{
-				sscanf_t(buf, _T("%d"), &ret);
-			}
+    int get_int()
+    {
+        char_t buf[128];
+        char_t* io_ret = gets(buf, sizeof(buf));
+        assert (io_ret);
+        int ret = 0;
+        if (io_ret)
+        {
+            sscanf_t(buf, _T("%d"), &ret);
+        }
 //  			int ret = 0;
 // 			read(&ret, sizeof(ret));
-			return ret;
-		}
-		// todo: should do some test .
-		string_t get_str()
-		{
-			string_t ret;
-			ret.reserve(256);
-			char_t* io_ret = NULL;
-			const unsigned BUFFER_SIZE = 64;
-			string_t tmp;
-			tmp.reserve(BUFFER_SIZE);
-			do
-			{
-				tmp.clear();
-				char_t buf[BUFFER_SIZE] = {0};
-				io_ret = gets(buf, BUFFER_SIZE);
-				tmp.assign(buf);
-				if (_T('\n') == tmp[tmp.size()-1])
-					tmp.resize(tmp.size() - 1);//pass '\n'
+        return ret;
+    }
+    // todo: should do some test .
+    string_t get_str()
+    {
+        string_t ret;
+        ret.reserve(256);
+        char_t* io_ret = NULL;
+        const unsigned BUFFER_SIZE = 64;
+        string_t tmp;
+        tmp.reserve(BUFFER_SIZE);
+        do
+        {
+            tmp.clear();
+            char_t buf[BUFFER_SIZE] = {0};
+            io_ret = gets(buf, BUFFER_SIZE);
+            tmp.assign(buf);
+            if (_T('\n') == tmp[tmp.size()-1])
+                tmp.resize(tmp.size() - 1);//pass '\n'
 
-				ret += tmp;
-			} while (io_ret && tmp.size() == BUFFER_SIZE-1);
+            ret += tmp;
+        }
+        while (io_ret && tmp.size() == BUFFER_SIZE-1);
 
-			return ret;
-		}
-	private:
-		FILE* _file;
-	};//class c_single_file
+        return ret;
+    }
+private:
+    FILE* _file;
+};//class c_single_file
 
 
 }// namespace junkun

@@ -76,6 +76,7 @@ bool win_file::write( const void *buffer,unsigned int length )
     DWORD written;
     if (!::WriteFile(_file_handle, buffer, length, &written, NULL))
     {
+        cout_trace(win_file::err_msg());
         return false;
     }
 
@@ -88,11 +89,13 @@ unsigned int win_file::write_ex( const void* buffer, unsigned int length )
     {
         return 0;
     }
-	assert (is_valid());
+
+    assert (is_valid());
     DWORD written;
     if (!::WriteFile(_file_handle, buffer, length, &written, NULL))
     {
-        assert (false);
+        // ERROR_INVALID_USER_BUFFER or ERROR_NOT_ENOUGH_MEMORY
+        cout_trace(win_file::err_msg());
         return 0;
     }
 
@@ -104,6 +107,7 @@ bool win_file::read( void *buffer, unsigned int length )
     DWORD read_bytes = 0;
     if (!::ReadFile(_file_handle, buffer, length, &read_bytes, NULL))
     {
+        cout_trace(win_file::err_msg());
         return false;
     }
     return( read_bytes != length );
@@ -114,7 +118,8 @@ unsigned int win_file::read_ex( void *buffer, unsigned int length )
     DWORD read_bytes;
     if (!::ReadFile(_file_handle, buffer, length, &read_bytes, NULL))
     {
-        assert (false);
+        //assert (false);
+        cout_trace(win_file::err_msg());
         return 0;
     }
     return read_bytes;
@@ -252,21 +257,38 @@ bool win_file::rename( const string_t& old_name, const string_t& new_name )
 
 bool win_file::remove( const string_t& file_name )
 {
-	if (is_dir(file_name))
-	{
-		std::vector<string_t> file_list;
-		path_included_file_list(file_name, file_list);
+    if (is_dir(file_name))
+    {
+        return rm_dir(file_name);
+    }
+    else
+        return (::DeleteFile( file_name.c_str() ) );
+}
 
-		for (unsigned i = 0; i < file_list.size(); ++i)
-		{
-			const string_t delete_file = file_name + file_list[i];
-			::DeleteFile(delete_file.c_str());
-			cout_trace( "delete file: " << delete_file);
-		}
-		return ::RemoveDirectory(file_name.c_str());
-	}
-	else
-		return (::DeleteFile( file_name.c_str() ) );
+bool win_file::rm_dir( const string_t& full_path )
+{
+    assert (is_dir(full_path));
+    std::vector<string_t> file_list;
+    path_included_file_list(full_path, file_list);
+
+    for (unsigned i = 0; i < file_list.size(); ++i)
+    {
+        string_t delete_file = full_path + file_list[i];
+        if (is_dir(delete_file))
+        {
+            if (_T('\\') != delete_file[delete_file.size()-1])
+                delete_file.push_back(_T('\\'));
+
+            rm_dir(delete_file);
+        }
+        else
+        {
+            ::DeleteFile(delete_file.c_str());
+            cout_trace( "delete file: " << delete_file);
+        }
+    }
+    cout_trace( "delete dir: " << full_path);
+    return ::RemoveDirectory(full_path.c_str());
 }
 
 bool win_file::is_dir( const string_t& full_path )
@@ -286,7 +308,7 @@ bool win_file::create_dir( const string_t& full_path )
 
 bool win_file::remove_dir(const string_t& full_path )
 {
-	return ::RemoveDirectory(full_path.c_str());
+    return ::RemoveDirectory(full_path.c_str());
 }
 
 bool win_file::copy( const string_t& source_name, const string_t& dest_name, bool overwrite_if_exists )
@@ -302,7 +324,7 @@ string_t win_file::err_msg()
     LPVOID lpMsgBuf;
     DWORD dw = error();
 
-	::FormatMessage(
+    ::FormatMessage(
         FORMAT_MESSAGE_ALLOCATE_BUFFER |
         FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -315,21 +337,21 @@ string_t win_file::err_msg()
     // Display the error message and exit the process
 
 // 	LPVOID lpDisplayBuf;
-	/// 111
+    /// 111
 //     lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
 //                                       (lstrlen((LPCTSTR)lpMsgBuf)+40)*sizeof(TCHAR));
 //
 //     StringCchPrintf((LPTSTR)lpDisplayBuf,
 //                     LocalSize(lpDisplayBuf),
 //                     _T("error %d: .err_msg: %s."), dw, lpMsgBuf);
-	/// 222
-	const unsigned iBuffLen = (lstrlen((LPCTSTR)lpMsgBuf)+64);
+    /// 222
+    const unsigned iBuffLen = (lstrlen((LPCTSTR)lpMsgBuf)+64);
     char_t* lpDisplayBuf = new char_t[iBuffLen];
-	//memset(lpDisplayBuf, 0, iBuffLen);
-	sprintf_t(lpDisplayBuf, _T("error:%d err_msg:%ls"), dw, lpMsgBuf);
-	string_t ret(lpDisplayBuf);
-	//LocalFree(lpDisplayBuf);
-	delete[] lpDisplayBuf;
+    //memset(lpDisplayBuf, 0, iBuffLen);
+    sprintf_t(lpDisplayBuf, _T("error:%d err_msg:%ls"), dw, lpMsgBuf);
+    string_t ret(lpDisplayBuf);
+    //LocalFree(lpDisplayBuf);
+    delete[] lpDisplayBuf;
     LocalFree(lpMsgBuf);
 
     return ret;

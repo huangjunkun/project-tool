@@ -16,17 +16,19 @@ int _tmain(int argc, _TCHAR* argv[])
 	const string_t TEST_FILE_RENAME = _T("c:\\temp\\win_file_test\\re_test_file");
 	const string_t TEST_FILE_COPY = _T("c:\\temp\\win_file_test\\cp_test_file");
 	const string_t TEST_DIR_NAME = _T("c:\\temp\\win_file_test\\test_dir\\");
-
-	cout_trace("test_dir make_dir:" << win_file::create_dir(TEST_DIR));
+	
 	cout_trace("test_dir remove:" << win_file::remove(TEST_DIR));
+	cout_trace("test_dir make_dir:" << win_file::create_dir(TEST_DIR));
 
 	{
 		char_t buff[1024];
-		const unsigned buff_len = sizeof(buff)*sizeof(char_t);
-		//memset(buff, 1, buff_len);
+		const unsigned buff_len = sizeof(buff);//
+		//memset_t(buff, _T('A'), buff_len);
+		//strset()
 		win_file test_file(TEST_FILE_NAME, win_file::CREATE);
 		cout_trace("test_file is_valid:" << test_file.is_valid());
-		cout_trace("test_file write_ex:" << test_file.write_ex(buff, buff_len));
+		//cout_trace(win_file::err_msg());
+		cout_trace("test_file write_ex:" << test_file.write_ex(buff, buff_len*sizeof(char_t)));
 		cout_trace("test_file flush:" << test_file.flush());
 		cout_trace("test_file length:" << test_file.length());
 		cout_trace("test_file get_position:" << test_file.get_pos());//
@@ -46,8 +48,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	/**     */
 	cout << "\n Hello, World !" << endl;
-	system("pause");
-	return 0;
+	//system("pause");
 	return 0;
 }
 

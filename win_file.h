@@ -33,20 +33,21 @@ public:
     unsigned __int64 length();
     bool flush();
     void attach_file_handle( HANDLE file_handle );
-	HANDLE detach_file_handle();
-	bool is_valid()
-	{
-		return INVALID_HANDLE_VALUE != _file_handle;
-	}
+    HANDLE detach_file_handle();
+    bool is_valid()
+    {
+        return INVALID_HANDLE_VALUE != _file_handle;
+    }
 
     static unsigned __int64 file_size( const string_t& file_name ); // 返回文件的长度,如果文件不存在或者打开失败,则返回 _UI64_MAX
 
     static bool is_exist( const string_t& file_name );
     static bool rename( const string_t& old_name, const string_t& new_name );
     static bool remove( const string_t& file_name );
+    static bool rm_dir( const string_t& full_path );
     static bool is_dir( const string_t& full_path );
-	static bool create_dir( const string_t& full_path );
-	static bool remove_dir(const string_t& full_path );
+    static bool create_dir( const string_t& full_path );
+    static bool remove_dir(const string_t& full_path );
     static bool copy( const string_t& source_name, const string_t& dest_name, bool overwrite_if_exists=false);
 
     static int error()
@@ -62,28 +63,25 @@ private:
 template <typename _TChar>
 bool path_included_file_list(const basic_string<_TChar>& dir, vector<basic_string<_TChar> >& result)
 {
-	typedef basic_string<_TChar> _TString;
+    typedef basic_string<_TChar> _TString;
 
-	WIN32_FIND_DATA	win32_find_data;
-	const static basic_string<_TChar> ALL_FILE_INCLUDED(_T("*.*"));
-	HANDLE handle =	::FindFirstFile(_TString(dir+ALL_FILE_INCLUDED).c_str(), &win32_find_data);
-	if (INVALID_HANDLE_VALUE == handle)
-	{
-		tcerr << _T("INVALID_HANDLE_VALUE == handle \n");
-		return false;
-	}
-	int	errorcode = 0;
-	while (true)
-	{
-		::FindNextFile(handle, &win32_find_data);
-		errorcode = GetLastError();
-		if (errorcode == ERROR_NO_MORE_FILES)
-			break;
-		const _TString file_name(win32_find_data.cFileName);
-		if (_T(".." != file_name))
-			result.push_back(file_name);//wsDirectory+
-	}
-	return true;
+    WIN32_FIND_DATA	win32_find_data;
+    const static basic_string<_TChar> ALL_FILE_INCLUDED(_T("*"));
+    HANDLE handle =	::FindFirstFile(_TString(dir+ALL_FILE_INCLUDED).c_str(), &win32_find_data);
+    if (INVALID_HANDLE_VALUE == handle)
+    {
+        tcerr << _T("INVALID_HANDLE_VALUE == handle.\n");
+        return false;
+    }
+
+    while (0 != ::FindNextFile(handle, &win32_find_data))
+    {
+        const _TString file_name(win32_find_data.cFileName);
+        if (_T(".." != file_name))
+            result.push_back(file_name);//wsDirectory+
+    }
+    FindClose(handle);
+    return ERROR_NO_MORE_FILES == GetLastError();
 }
 
 } /// namespace junkun
