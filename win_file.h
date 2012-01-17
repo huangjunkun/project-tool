@@ -9,6 +9,18 @@
 #include <Windows.h>
 #include "c_single_file.h"
 
+/**
+** 源文件： win_file.h, win_file.cpp, win_file_test.cpp
+** 功能说明：
+** 类型win_file封装Win32-API文件操作，完成一组基本的文件操作功能包含：
+** #1 win_file对象自动创建或打开，关闭文件。文件读写，设置位置。
+** #2 静态方法有创建目录，删除目录，判断目录，删除文件，复制文件，文件重命名。
+** #3 注意，在文件操作返回失败时，建议调用error()或err_msg()获取具体的错误信息.
+** #4：操作系统：windows 7 专业版
+** 开发+测试环境：VS2003 + CodeBlocks10.02
+** 作者：junkun huang  e-mail：huangjunkun@gmail.com
+** 日期：2011-09-02 /
+*/
 
 namespace junkun
 {

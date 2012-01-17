@@ -8,6 +8,22 @@
 //#include <stl/_alloc.h>
 
 
+/**
+** 源文件： win32_sync_func.h, win32_sync_func_test.cpp
+** 功能说明：
+** #1：先抽象基类型locker，然后派生不同子类型mutex，event，critical_section，semaphore四款常用的锁，均实用于需要同步操作情况。
+** 注意：其中类型critical_section非WIN内核对象区别于其他类型内核对象，其包含成员数据稍微不同。
+** #2：包含另一种锁实现模式，模板推导技术完成，即win_sync_functor，同样继承基类locker。需根据不同锁操作来定义不同相关类型：
+** _Constructor, _Destoryer, _Locker, _Unlocker，该类型用于win_sync_functor的模板参数，最终完成类型的推导。
+** 已实现推导类型mutex2（可类似设计类型event2，critical_section2，semaphore2）。
+** #3：模板类型scoped_lock_t用于辅助以上不同锁类型的使用。以上具体实现细节详见代码。
+** #4：操作系统：windows 7 专业版
+** 开发+测试环境：VS2003 + CodeBlocks10.02
+
+** 作者：junkun huang  e-mail：huangjunkun@gmail.com
+** 日期：2011-10-16 /
+*/
+
 namespace junkun
 {
 using namespace std;
