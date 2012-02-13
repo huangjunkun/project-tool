@@ -6,6 +6,25 @@
 ** Declare: 
   计划在该git工程存放，工程性的工具代码。欢迎交流，谢谢！
 **/
+
+**/
+
+**/
+
+**/
+
+**/
+
+**/
+
+**/
+9.
+/**
+** 源文件： utf8.h utf8.c
+** 功能说明： 字符编码转换功能，包括utf8转宽字节，宽字节转utf8。引用自cloudwu。
+** 
+*/
+
 8.
 /**
 ** 源文件： win_file.h, win_file.cpp, win_file_test.cpp
@@ -16,7 +35,7 @@
 ** #3 注意，在文件操作返回失败时，建议调用error()或err_msg()获取具体的错误信息.
 ** #4：操作系统：windows 7 专业版
 ** 开发+测试环境：VS2003 + CodeBlocks10.02
-** 作者：junkun huang  e-mail：huangjunkun@gmail.com
+** 作者：junkun huang
 ** 日期：2011-09-02 /
 */
 
@@ -33,7 +52,7 @@
 ** #4：操作系统：windows 7 专业版
 ** 	开发+测试环境：VS2003 + CodeBlocks10.02
 
-** 作者：junkun huang  e-mail：huangjunkun@gmail.com
+** 作者：junkun huang
 ** 日期：2011-10-16 /
 */
 
@@ -45,7 +64,7 @@
 ** 封装sqlite原生的数据库操作API。可以简便完成执行SQL语句，操作包括创建，插入，更新，删除，查询数据等。
 ** 详细见下面类型CSqliteOperator的定义。还定义其他的sqlite辅助类型，包括数据库类型，事务类型，锁类型。
 
-** 作者：junkun huang  e-mail：huangjunkun@gmail.com
+** 作者：junkun huang
 ** 日期：2011-12-02 /
 */
 
@@ -56,7 +75,7 @@
 ** 源文件： win32_timer_class.h, win32_timer_class_test.cpp
 ** 封装WIN定时器操作API，抽象实现timer类型，方便使用。
 **
-** 作者：junkun huang  e-mail：huangjunkun@gmail.com
+** 作者：junkun huang
 ** 日期：2011-06-25 /
 */
 
@@ -67,7 +86,7 @@
 ** 功能描述：封装WIN线程API，抽象实现线程基类thread_base。
 ** 方便用于定制具体操作的线程子类。
 **
-** 作者：junkun huang  e-mail：huangjunkun@gmail.com
+** 作者：junkun huang
 ** 日期：2010-12-25 /
 */
 
@@ -80,7 +99,7 @@
 ** 功能： 裁剪字符串，针对字符串首尾裁剪空格与制表符。
 ** 类型： c_single_file
 ** 功能： 封装CRT基本的文件读写操作。方便使用。
-** 作者：junkun huang  e-mail：huangjunkun@gmail.com
+** 作者：junkun huang
 ** 日期：2011-07-21 /
 */
 
@@ -93,7 +112,7 @@
 ** 输入过程中，缓冲区会自动调整缓冲大小。目前仅支持类型unsigned，int，tchar，std::string，还有vector集合。
 ** 支持其他或基本类型自定义类型的输入输出，需设计者继续自行扩展。
 
-** 作者：junkun huang  e-mail：huangjunkun@gmail.com
+** 作者：junkun huang
 ** 日期：2010-11-25 /
 */
 
@@ -103,6 +122,8 @@
 ** 功能描述：提供字节序转化的基本函数，包括判断本机字节序高端或低端功能。
 ** ** 包含测试程序。
 ** 
-** 作者：junkun huang  e-mail：huangjunkun@gmail.com
+** 作者：junkun huang
 ** 日期：2010-11-25 /
 */
+
+** 作者：junkun huang  e-mail：huangjunkun@gmail.com
