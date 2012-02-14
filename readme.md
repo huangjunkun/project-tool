@@ -1,29 +1,14 @@
-﻿/**
+﻿## project-tool
+
 ** project name:  project-tool
 ** date:          2011-12-19 14:45
 ** author:        junkun huang
 ** e-mail:        huangjunkun@gmail.com
 ** Declare: 
   计划在该git工程存放，工程性的工具代码。欢迎交流，谢谢！
-**/
 
-**/
-10.
-
-
-**/
-10.
-
-
-**/
-10.
-
-
-**/
-10.
-
-**/
 ## 10.
+
 /**
 ** 源文件： TransByteOrderStream.h TransByteOrderStream.c
 ** 功能说明： 用于传输的字节流编解码，区分字节的网络序与主机序。
@@ -35,16 +20,19 @@
 
 **/
 ## 9.
+
 /**
 ** 源文件： utf8.h utf8.c
 ** 功能说明： 字符编码转换功能，包括utf8转宽字节，宽字节转utf8。引用自cloudwu's github form
 ```C
 ** https://github.com/cloudwu/windsoul/blob/master/src/core/utf8.c
+
 ** https://github.com/cloudwu/windsoul/blob/master/src/core/utf8.h
 ```
 */
 
 ## 8.
+
 /**
 ** 源文件： win_file.h, win_file.cpp, win_file_test.cpp
 ** 功能说明：
@@ -59,6 +47,7 @@
 */
 
 ## 7. 
+
 /**
 ** 源文件： win32_sync_func.h, win32_sync_func_test.cpp
 ** 功能说明：
@@ -76,6 +65,7 @@
 */
 
 ## 6. 
+
 /**
 ** 源文件： SqliteOperator.h, SqliteOperator.cpp, SqliteOperatorTest.cpp
 ** 功能说明：
@@ -122,6 +112,7 @@
 */
 
 ## 2.
+
 /**
 ** 源文件：cout_buffer.h, cout_buffer_test.cpp
 ** 功能描述：
@@ -135,6 +126,7 @@
 */
 
 ## 1. 
+
 /**
 ** 源文件：big_or_little_endian_func.cpp
 ** 功能描述：提供字节序转化的基本函数，包括判断本机字节序高端或低端功能。
