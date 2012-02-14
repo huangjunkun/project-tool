@@ -1,5 +1,4 @@
 ﻿## project-tool
-
 ** project name:  project-tool
 ** date:          2011-12-19 14:45
 ** author:        junkun huang
@@ -8,7 +7,6 @@
   计划在该git工程存放，工程性的工具代码。欢迎交流，谢谢！
 
 ## 10.
-
 /**
 ** 源文件： TransByteOrderStream.h TransByteOrderStream.c
 ** 功能说明： 用于传输的字节流编解码，区分字节的网络序与主机序。
@@ -20,19 +18,16 @@
 
 **/
 ## 9.
-
 /**
 ** 源文件： utf8.h utf8.c
 ** 功能说明： 字符编码转换功能，包括utf8转宽字节，宽字节转utf8。引用自cloudwu's github form
 ```C
 ** https://github.com/cloudwu/windsoul/blob/master/src/core/utf8.c
-
 ** https://github.com/cloudwu/windsoul/blob/master/src/core/utf8.h
 ```
 */
 
 ## 8.
-
 /**
 ** 源文件： win_file.h, win_file.cpp, win_file_test.cpp
 ** 功能说明：
@@ -47,7 +42,6 @@
 */
 
 ## 7. 
-
 /**
 ** 源文件： win32_sync_func.h, win32_sync_func_test.cpp
 ** 功能说明：
@@ -59,13 +53,11 @@
 ** #3：模板类型scoped_lock_t用于辅助以上不同锁类型的使用。以上具体实现细节详见代码。
 ** #4：操作系统：windows 7 专业版
 ** 	开发+测试环境：VS2003 + CodeBlocks10.02
-
 ** 作者：junkun huang
 ** 日期：2011-10-16 /
 */
 
 ## 6. 
-
 /**
 ** 源文件： SqliteOperator.h, SqliteOperator.cpp, SqliteOperatorTest.cpp
 ** 功能说明：
@@ -76,9 +68,7 @@
 ** 日期：2011-12-02 /
 */
 
-
 ## 5.
-
 /**
 ** 源文件： win32_timer_class.h, win32_timer_class_test.cpp
 ** 封装WIN定时器操作API，抽象实现timer类型，方便使用。
@@ -88,7 +78,6 @@
 */
 
 ## 4.
-
 /**
 ** 源文件： win32_thread_class.h, win32_thrad_class_test.cpp
 ** 功能描述：封装WIN线程API，抽象实现线程基类thread_base。
@@ -99,7 +88,6 @@
 */
 
 ## 3.
-
 /**
 ** 文件： c_singe_file.h，c_singe_file_test.cpp
 **
@@ -112,7 +100,6 @@
 */
 
 ## 2.
-
 /**
 ** 源文件：cout_buffer.h, cout_buffer_test.cpp
 ** 功能描述：
@@ -126,7 +113,6 @@
 */
 
 ## 1. 
-
 /**
 ** 源文件：big_or_little_endian_func.cpp
 ** 功能描述：提供字节序转化的基本函数，包括判断本机字节序高端或低端功能。
@@ -136,4 +122,4 @@
 ** 日期：2010-11-25 /
 */
 
-### 作者：junkun huang  e-mail：huangjunkun@gmail.com
+## e-mail：huangjunkun@gmail.com
