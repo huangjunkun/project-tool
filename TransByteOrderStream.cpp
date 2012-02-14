@@ -139,8 +139,7 @@ namespace xl
 		const xl::uint32 len = sizeof(int_value);
 		if ( _buf_len < len )
 		{
-			LOG_WARN("buffer is insufficient to write! _buf_len: " << _buf_len << " len: " << len);\
-				ATLASSERT(FALSE);
+			ATLASSERT(FALSE);
 			return *this;
 		}	
 		T trans_value = xl::hton(int_value);//主机序转为网络序
@@ -157,8 +156,7 @@ namespace xl
 		const xl::uint32 len = sizeof(int_value);
 		if ( _buf_len < len )
 		{
-			LOG_WARN("buffer is insufficient to read! _buf_len: " << _buf_len << " len: " << len);\
-				ATLASSERT(FALSE);
+			ATLASSERT(FALSE);
 			return *this;
 		}
 		T tmp;
@@ -217,7 +215,6 @@ namespace xl
 		*this << len;
 		if ( _buf_len < len )
 		{
-			LOG_WARN("buffer is insufficient to write2! _buf_len: " << _buf_len << " len: " << len);
 			ATLASSERT(FALSE);
 			return *this;
 		}
@@ -237,7 +234,6 @@ namespace xl
 		*this >> len;
 		if ( _buf_len < len )
 		{
-			LOG_WARN("buffer is insufficient to read2! _buf_len: " << _buf_len << " len: " << len);
 			ATLASSERT(FALSE);
 			return *this;
 		}
@@ -259,7 +255,6 @@ namespace xl
 	{
 		if (_buf_len < len ) 
 		{
-			LOG_WARN("buffer is insufficient to write3! _buf_len: " << _buf_len << " len: " << len);
 			ATLASSERT(FALSE);
 			return;
 		}
@@ -277,7 +272,6 @@ namespace xl
 	{
 		if (_buf_len < len) 
 		{
-			LOG_WARN("buffer is insufficient to read3! _buf_len: " << _buf_len << " len: " << len);
 			ATLASSERT(FALSE);
 			return;
 		}
@@ -295,7 +289,6 @@ namespace xl
 	{
 		if ( _buf_len < len )
 		{
-			LOG_WARN("buffer is insufficient to read4! _buf_len: " << _buf_len << " len: " << len);
 			ATLASSERT(FALSE);
 			return;
 		}

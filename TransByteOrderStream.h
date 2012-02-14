@@ -6,6 +6,15 @@
 #include <cassert>
 
 
+/**
+** 源文件： TransByteOrderStream.h TransByteOrderStream.c
+** 功能说明： 用于传输的字节流编解码，区分字节的网络序与主机序。
+** 类型TransByteOrderIOStream的详细功能已参加代码。
+** 开发+测试环境：VS2003 & CodeBlocks10.02
+** 作者：junkun huang
+** 日期：2010-12-02 /
+*/
+
 namespace xl
 {
 
@@ -115,14 +124,11 @@ namespace xl
 		xl::uint32 _buf_size;
 		xl::uint32 _bytes_read;
 		xl::uint32 _bytes_written;
-
-		//*LOG_CLS_DEC*/();
 		template <typename T> 
 		inline TransByteOrderIOStream& stream_read_int(T int_value);
 		template <typename T> 
 		inline TransByteOrderIOStream& stream_write_to_int(T& int_value);
 
-		LOG_CLS_DEC();
 	};
 
 	template <typename T>
