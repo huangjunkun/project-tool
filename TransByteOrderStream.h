@@ -1,7 +1,6 @@
-#ifndef TRANSBYTEORDERSTREAM_H
-#define TRANSBYTEORDERSTREAM_H
+#ifndef __TRANS_BYTE_ORDER_STREAM_H_
+#define __TRANS_BYTE_ORDER_STREAM_H_
 
-#include <atldef.h>
 #include <vector>
 #include <cassert>
 
@@ -17,23 +16,12 @@
 
 namespace xl
 {
-
-	//////////////////////////////////////////////////////////////////////////
-#ifndef thunder_assert
-#define thunder_assert ATLASSERT
-#endif
-
-#ifndef release_assert
-#define release_assert ATLASSERT
-#endif
 	//////////////////////////////////////////////////////////////////////////
 
-	//////////////////////////////////////////////////////////////////////////
-
-	typedef xl::uint8  uint8;
-	typedef xl::uint16 uint16;
-	typedef xl::uint32 uint32;
-	typedef xl::uint64 uint64;
+	typedef unsigned char		uint8;
+	typedef unsigned short		uint16;
+	typedef unsigned int		uint32;
+	typedef unsigned __int64	uint64;
 
 	uint8  hton(uint8 n);
 	uint16 hton(uint16 n);
@@ -44,13 +32,15 @@ namespace xl
 	uint16 ntoh(uint16 n);
 	uint32 ntoh(uint32 n);
 	uint64 ntoh(uint64 n);
+	bool TestBigEndian();
+	bool TestLittleEndian();
 
 }///namespace xl
 
 
 //////////////////////////////////////////////////////////////////////////
 	typedef xl::uint8		backagent_cmd_byte;
-	typedef xl::uint16		backagent_cmd_short; 
+	typedef xl::uint16		backagent_cmd_short;
 	typedef xl::uint32		backagent_cmd_int;
 	typedef xl::uint64		backagent_cmd_long;
 	typedef std::string		backagent_cmd_string;
@@ -82,7 +72,7 @@ namespace xl
 
 	class TransByteOrderIOStream
 	{
-	public:	
+	public:
 		TransByteOrderIOStream(char * buf_ptr, xl::uint32 buf_len);
 		virtual ~TransByteOrderIOStream();
 
@@ -100,7 +90,7 @@ namespace xl
 
 		TransByteOrderIOStream & operator<<(const backagent_cmd_string & string_value);
 		TransByteOrderIOStream & operator>>(backagent_cmd_string & string_value);
-	
+
 		template <typename T>
 			TransByteOrderIOStream& operator<<(const std::vector<T>& vec);
 		template <typename T>
@@ -124,9 +114,9 @@ namespace xl
 		xl::uint32 _buf_size;
 		xl::uint32 _bytes_read;
 		xl::uint32 _bytes_written;
-		template <typename T> 
+		template <typename T>
 		inline TransByteOrderIOStream& stream_read_int(T int_value);
-		template <typename T> 
+		template <typename T>
 		inline TransByteOrderIOStream& stream_write_to_int(T& int_value);
 
 	};
@@ -158,4 +148,4 @@ namespace xl
 
 
 //////////////////////////////////////////////////////////////////////////
-#endif
+#endif //__TRANS_BYTE_ORDER_STREAM_H_

@@ -3,8 +3,8 @@
 #include "MobileCommands.h"
 
 
-// namespace test_namespace
-// {
+namespace xl
+{
 //////////////////////////////////////////////////////////////////////////
 
 	//////////////////////////////////////////////////////////////////////////
@@ -27,12 +27,19 @@
 		return ins.get_ptr();//返回下次开始读的偏移地址
 	}
 
-	unsigned CCommandBase::Length() const 
-	{
+	unsigned CCommandBase::Length() const
+	{	/// 直接返回0，因为command length (m_command_length) 不包含该基类字段长度。
 		return 0;
-		// 			return sizeof(m_protocol_version) + \
-		// 				sizeof(m_sequence) + \
-		// 				sizeof(m_command_length);
+		// 	return sizeof(uint32) + \
+		// 		sizeof(uint32) + \
+		// 		sizeof(uint32);
+	}
+
+	unsigned CCommandBase::SizeOf()
+	{
+		return sizeof(UInt32) + \
+			sizeof(UInt32) + \
+			sizeof(UInt32);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -49,7 +56,15 @@
 		return outs.get_ptr();
 	}
 
-	unsigned CCommandRequestBase::Length() const 
+	unsigned CCommandRequestBase::SizeOf()
+	{
+		return CBase::SizeOf() + \
+			sizeof(UInt32) + \
+			sizeof(UInt32) + \
+			sizeof(UInt32);
+	}
+
+	unsigned CCommandRequestBase::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_command_name) + \
@@ -57,7 +72,7 @@
 			sizeof(m_priority_level);
 	}
 
-	bool CCommandRequestBase::SetPriority(uint32 priority) 
+	bool CCommandRequestBase::SetPriority(UInt32 priority)
 	{
 		if (priority > 9)
 			return false;
@@ -84,7 +99,15 @@
 		return ins.get_ptr();
 	}
 
-	unsigned CCommandResponseBase::Length() const 
+	unsigned CCommandResponseBase::SizeOf()
+	{
+		return CBase::SizeOf() + \
+			sizeof(UInt32) + \
+			sizeof(UInt32) + \
+			sizeof(UInt32);
+	}
+
+	unsigned CCommandResponseBase::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_command_name) + \
@@ -108,7 +131,7 @@
 		return ins.get_ptr();
 	}
 
-	unsigned CErrorResponse::Length() const 
+	unsigned CErrorResponse::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_error_code);
@@ -123,7 +146,7 @@
 		return ins.get_ptr();
 	}
 
-	unsigned CLogWifiRequest::Length() const 
+	unsigned CLogWifiRequest::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_password.size()) + m_password.size();
@@ -136,7 +159,7 @@
 		return ins.get_ptr();
 	}
 
-	unsigned CLogWifiResponse::Length() const 
+	unsigned CLogWifiResponse::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_phone_id.size()) + m_phone_id.size();
@@ -147,11 +170,11 @@
 	char* CTimeTickRequset::TransByteOrderAndWrite(char* pOutData, unsigned length)
 	{
 		char* pDataPos = CBase::TransByteOrderAndWrite(pOutData, length);
-		release_assert(pDataPos - pOutData <= length);
+		assert(pDataPos - pOutData <= length);
 		return pDataPos;
 	}
 
-	unsigned CTimeTickRequset::Length() const 
+	unsigned CTimeTickRequset::Length() const
 	{
 		return CBase::Length();
 	}
@@ -159,11 +182,11 @@
 	char* CTimeTickResponse::TransByteOrderAndRead(char* pOutData, unsigned length)
 	{
 		char* pDataPos = CBase::TransByteOrderAndRead(pOutData, length);
-		release_assert(pDataPos - pOutData <= length);
+		assert(pDataPos - pOutData <= length);
 		return pDataPos;
 	}
 
-	unsigned CTimeTickResponse::Length() const 
+	unsigned CTimeTickResponse::Length() const
 	{
 		return CBase::Length();
 	}
@@ -173,10 +196,10 @@
 	char* CListPartitionRequest::TransByteOrderAndWrite(char* pOutData, unsigned length)
 	{
 		char* pDataPos = CBase::TransByteOrderAndWrite(pOutData, length);
-		release_assert(pDataPos - pOutData <= length);
+		assert(pDataPos - pOutData <= length);
 		return pDataPos;
 	}
-	unsigned CListPartitionRequest::Length() const 
+	unsigned CListPartitionRequest::Length() const
 	{
 		return CBase::Length();
 	}
@@ -198,10 +221,10 @@
 		return ins.get_ptr();
 	}
 
-	unsigned CListPartitionResponse::Length() const 
+	unsigned CListPartitionResponse::Length() const
 	{
 		return CBase::Length() + \
-			sizeof(m_partitions.size()) + sizeof(uint32) * m_partitions.size();
+			sizeof(m_partitions.size()) + sizeof(UInt32) * m_partitions.size();
 	}
 	//////////////////////////////////////////////////////////////////////////
 	/// 5，	获取分区信息
@@ -214,7 +237,7 @@
 		return outs.get_ptr();
 	}
 
-	unsigned CGetPatitionInfoRequest::Length() const 
+	unsigned CGetPatitionInfoRequest::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_partition_index);
@@ -229,7 +252,7 @@
 		return ins.get_ptr();
 	}
 
-	unsigned CGetPatitionInfoResponse::Length() const 
+	unsigned CGetPatitionInfoResponse::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_partition_remain_size) + \
@@ -238,7 +261,7 @@
 
 	//////////////////////////////////////////////////////////////////////////
 	/// 6，	List目录
-	unsigned CFileStruct::Length() const 
+	unsigned CFileStruct::Length() const
 	{
 		return sizeof(m_struct_length) + \
 			sizeof(m_file_name.size()) + m_file_name.size() + \
@@ -262,6 +285,8 @@
 		ins >> m_file_type;
 		ins >> m_modify_time;
 		ins >> m_create_time;
+
+		assert(Length()-sizeof(m_struct_length) == m_struct_length);
 		return ins;
 	}
 	TransByteOrderIOStream& CFileStruct::operator<< (TransByteOrderIOStream& outs)
@@ -291,6 +316,7 @@
 		ins >> m_modify_time;
 		ins >> m_create_time;
 
+		assert(Length()-sizeof(m_struct_length) == m_struct_length);
 		return ins.get_ptr();
 	}
 
@@ -320,7 +346,7 @@
 		return outs.get_ptr();
 	}
 
-	unsigned CListPathRequest::Length() const 
+	unsigned CListPathRequest::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_partition_index) + \
@@ -332,7 +358,7 @@
 	{
 		char* pDataPos = CBase::TransByteOrderAndRead(pOutData, length);
 		TransByteOrderIOStream ins(pDataPos, length-(pDataPos-pOutData));
-		uint32 size;
+		UInt32 size;
 		ins >> size;
 		// 			pDataPos = ins.get_ptr();//plan 2
 		//  		unsigned buffer_len = ins.get_len();//plan 2
@@ -345,19 +371,19 @@
 			// 				pDataPos = filestruct.TransByteOrderAndRead(pDataPos, buffer_len)//plan 2
 			// 				unsigned buffer_len = pDataPos - ins.get_ptr();//plan 2
 
-			m_file_structs.push_back(filestruct);
+			m_file_array.push_back(filestruct);
 		}
 		return ins.get_ptr();
 		//			return pDataPos;//plan 2
 	}
 
-	unsigned CListPathResponse::Length() const 
+	unsigned CListPathResponse::Length() const
 	{
 		unsigned length = CBase::Length();
-		length += sizeof(m_file_structs.size());
+		length += sizeof(m_file_array.size());
 
-		for( size_t i=0; i < m_file_structs.size(); i++)
-			length += m_file_structs[i].Length();
+		for( size_t i=0; i < m_file_array.size(); i++)
+			length += m_file_array[i].Length();
 
 		return length;
 	}
@@ -374,19 +400,20 @@
 		return outs.get_ptr();
 	}
 
-	unsigned CDeleteFileRequest::Length() const 
+	unsigned CDeleteFileRequest::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_partition_index) + \
 			sizeof(m_full_filename.size()) + m_full_filename.size();
 	}
+
 	char* CDeleteFileResponse::TransByteOrderAndRead(char* pOutData, unsigned length)
 	{
 		char* pDataPos = CBase::TransByteOrderAndRead(pOutData, length);
 		return pDataPos;
 	}
 
-	unsigned CDeleteFileResponse::Length() const 
+	unsigned CDeleteFileResponse::Length() const
 	{
 		return CBase::Length();
 	}
@@ -404,7 +431,7 @@
 		return outs.get_ptr();
 	}
 
-	unsigned CRenameFileRequest::Length() const 
+	unsigned CRenameFileRequest::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_partition_index) + \
@@ -417,7 +444,7 @@
 		return pDataPos;
 	}
 
-	unsigned CRenameFileResponse::Length() const 
+	unsigned CRenameFileResponse::Length() const
 	{
 		return CBase::Length();
 	}
@@ -435,7 +462,7 @@
 		return outs.get_ptr();
 	}
 
-	unsigned CIsExistFileRequest::Length() const 
+	unsigned CIsExistFileRequest::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_partition_index) + \
@@ -451,7 +478,7 @@
 		return ins.get_ptr();
 	}
 
-	unsigned CIsExistFileResponse::Length() const 
+	unsigned CIsExistFileResponse::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_is_exist);
@@ -469,7 +496,7 @@
 		return outs.get_ptr();
 	}
 
-	unsigned CGetMediaInfoRequest::Length() const 
+	unsigned CGetMediaInfoRequest::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_partition_index) + \
@@ -492,7 +519,7 @@
 		return ins.get_ptr();
 	}
 
-	unsigned CGetMediaInfoResponse::Length() const 
+	unsigned CGetMediaInfoResponse::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_duration.size()) + m_duration.size() + \
@@ -522,7 +549,7 @@
 		return outs.get_ptr();
 	}
 
-	unsigned CCaptureFromVedioRequest::Length() const 
+	unsigned CCaptureFromVedioRequest::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_picture_format) + \
@@ -552,7 +579,7 @@
 		return ins.get_ptr();
 	}
 
-	unsigned CCaptureFromVedioResponse::Length() const 
+	unsigned CCaptureFromVedioResponse::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_dst_filename.size()) + m_dst_filename.size() + \
@@ -583,7 +610,7 @@
 		return outs.get_ptr();
 	}
 
-	unsigned CCaptureFromeImageRequest::Length() const 
+	unsigned CCaptureFromeImageRequest::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_picture_format) + \
@@ -604,7 +631,7 @@
 		return ins.get_ptr();
 	}
 
-	unsigned CCaptureFromImageResponse::Length() const 
+	unsigned CCaptureFromImageResponse::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_dst_filename);
@@ -623,7 +650,7 @@
 		return outs.get_ptr();
 	}
 
-	unsigned CFindFilesRequest::Length() const 
+	unsigned CFindFilesRequest::Length() const
 	{
 		unsigned length = CBase::Length() + \
 			sizeof(m_partition_index) + \
@@ -646,7 +673,7 @@
 	{
 		char* pDataPos = CBase::TransByteOrderAndRead(pOutData, length);
 		TransByteOrderIOStream ins(pDataPos, length-(pDataPos-pOutData));
-		uint32 size = 0;
+		UInt32 size = 0;
 		ins >> size;
 		for (size_t i=0; i < size; i++)
 		{
@@ -658,7 +685,7 @@
 		return ins.get_ptr();
 	}
 
-	unsigned CFindFileResponse::Length() const 
+	unsigned CFindFileResponse::Length() const
 	{
 		unsigned length = CBase::Length() + sizeof(m_type_collection.size());
 		for (size_t i=0; i < m_type_collection.size(); i++)
@@ -680,7 +707,7 @@
 		return outs.get_ptr();
 	}
 
-	unsigned CGetMP3InfoRequest::Length() const 
+	unsigned CGetMP3InfoRequest::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_partition_index) + \
@@ -697,7 +724,7 @@
 		return ins.get_ptr();
 	}
 
-	unsigned CGetMP3InfoResponse::Length() const 
+	unsigned CGetMP3InfoResponse::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_duration.size()) + m_duration.size() + \
@@ -719,7 +746,7 @@
 		return outs.get_ptr();
 	}
 
-	unsigned CSendFileRequest::Length() const 
+	unsigned CSendFileRequest::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_partition_index) + \
@@ -735,7 +762,7 @@
 		return pDataPos;
 	}
 
-	unsigned CSendFileResponse::Length() const 
+	unsigned CSendFileResponse::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_success_offset) + \
@@ -754,7 +781,7 @@
 		return outs.get_ptr();
 	}
 
-	unsigned CRecvFileRequest::Length() const 
+	unsigned CRecvFileRequest::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_partition_index) + \
@@ -771,7 +798,7 @@
 		ins >> m_file_content;// ...
 		return ins.get_ptr();
 	}
-	unsigned CRecvFileResponse::Length() const 
+	unsigned CRecvFileResponse::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_file_size) + \
@@ -790,7 +817,7 @@
 		return outs.get_ptr();
 	}
 
-	unsigned CGetFileSizeRequest::Length() const 
+	unsigned CGetFileSizeRequest::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_partition_index) + \
@@ -804,11 +831,11 @@
 		ins >> m_file_size;
 		return ins.get_ptr();
 	}
-	unsigned CGetFileSizeResponse::Length() const 
+	unsigned CGetFileSizeResponse::Length() const
 	{
 		return CBase::Length() + \
 			sizeof(m_file_size);
 	}
 
 //////////////////////////////////////////////////////////////////////////
-//}//namespace test_namespace
+}//namespace xl

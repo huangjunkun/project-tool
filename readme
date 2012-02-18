@@ -4,13 +4,15 @@
 ** author:        junkun huang
 ** e-mail:        huangjunkun@gmail.com
 ** Declare: 
-  计划在该git工程存放，工程性的工具代码。欢迎交流，谢谢！
+  该git工程存放，工程性的工具代码，或工作时项目开发前期测试性代码。
+  每一份源码均有一段简要的说明，详见如下内容。欢迎交流，谢谢！
 
 ## 11.
 /**
-** 源文件： MobileCommands.h MobileCommands.cpp
+** 源文件： MobileCommands.h MobileCommands.cpp MobileCommandsTest.cpp
+** 引用文件：TransByteOrderStream.h TransByteOrderStream.cpp
 ** 功能说明：协议编解码示例，如手机通讯交互协议，以下包含多条交互命令，通信数据以字节流编解码完成。
-** 详见以下代码。类似协议的制定，可参考这样的设计模式。使用到类型TransByteOrderStream的编解码处理。
+** 详细设计参见相关代码。类似协议的制定，可参考这样的设计模式。使用到类型TransByteOrderStream的编解码处理。
 ** 作者：junkun huang
 ** 日期：2010-12-11 /
 */

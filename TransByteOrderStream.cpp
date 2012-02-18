@@ -24,6 +24,7 @@ namespace xl
 		static bool s_is_big_endian = _TestBigEndian();
 		return s_is_big_endian;
 	}
+
 	bool _TestLittleEndian()
 	{
 		union UnionForTest
@@ -46,7 +47,7 @@ namespace xl
 		if (TestBigEndian())
 			return n;
 		return	((n & 0xff) << 8) |
-			((n & 0xff00) >> 8);		
+			((n & 0xff00) >> 8);
 	}
 	uint16 ntohs(uint16 n) { return htons(n); }
 
@@ -65,17 +66,18 @@ namespace xl
 	{
 		if (TestBigEndian())
 			return n;
-		release_assert(TestLittleEndian());
+		assert(TestLittleEndian());
 
 		return ((n & 0xff) << 56) |
 			((n & 0xff00) << 40) |
 			((n & 0xff0000) << 24) |
 			((n & 0xff000000) << 8) |
-			((n & 0xff00000000) >> 8) |
-			((n & 0xff0000000000) >> 24) |
-			((n & 0xff000000000000) >> 40) |
-			((n & 0xff00000000000000) >> 56);
+			((n & 0xff00000000LL) >> 8) |
+			((n & 0xff0000000000LL) >> 24) |
+			((n & 0xff000000000000LL) >> 40) |
+			((n & 0xff00000000000000LL) >> 56);
 	}
+
 	uint64 ntohll(uint64 n) { return htonll(n); }
 
 	uint8  hton(uint8 n) { return n; }
@@ -100,9 +102,9 @@ namespace xl
 	// 		else if (8 == sizeof(n))
 	// 			return htonll(n);
 	// 		else
-	// 			release_assert(false);
+	// 			assert(false);
 	// 	}
-	// 
+	//
 	// 	template <typename T>
 	// 	T ntoh (T n)
 	// 	{
@@ -115,7 +117,7 @@ namespace xl
 	// 		else if (8 == sizeof(n))
 	// 			return ntohll(n);
 	// 		else
-	// 			release_assert(false);
+	// 			assert(false);
 	// 	}
 
 }///namespace xl
@@ -139,9 +141,9 @@ namespace xl
 		const xl::uint32 len = sizeof(int_value);
 		if ( _buf_len < len )
 		{
-			ATLASSERT(FALSE);
+			assert (false);
 			return *this;
-		}	
+		}
 		T trans_value = xl::hton(int_value);//主机序转为网络序
 		memcpy( _buf_ptr, &trans_value, len );
 		_buf_ptr += len;
@@ -156,7 +158,7 @@ namespace xl
 		const xl::uint32 len = sizeof(int_value);
 		if ( _buf_len < len )
 		{
-			ATLASSERT(FALSE);
+			assert(false);
 			return *this;
 		}
 		T tmp;
@@ -215,7 +217,7 @@ namespace xl
 		*this << len;
 		if ( _buf_len < len )
 		{
-			ATLASSERT(FALSE);
+			assert(false);
 			return *this;
 		}
 		if ( len != 0 )
@@ -234,7 +236,7 @@ namespace xl
 		*this >> len;
 		if ( _buf_len < len )
 		{
-			ATLASSERT(FALSE);
+			assert(false);
 			return *this;
 		}
 		if (len != 0)
@@ -253,13 +255,13 @@ namespace xl
 
 	void TransByteOrderIOStream::copy_byte_to(char *byte_array, xl::uint32 len)
 	{
-		if (_buf_len < len ) 
+		if (_buf_len < len )
 		{
-			ATLASSERT(FALSE);
+			assert(false);
 			return;
 		}
 
-		if (len > 0) 
+		if (len > 0)
 		{
 			memcpy(_buf_ptr,byte_array,len);
 			_buf_ptr    += len;
@@ -270,13 +272,13 @@ namespace xl
 
 	void TransByteOrderIOStream::copy_byte_from(char *byte_array, xl::uint32 len)
 	{
-		if (_buf_len < len) 
+		if (_buf_len < len)
 		{
-			ATLASSERT(FALSE);
+			assert(false);
 			return;
 		}
 
-		if (len > 0) 
+		if (len > 0)
 		{
 			memcpy(byte_array,_buf_ptr,len);
 			_buf_ptr      += len;
@@ -289,7 +291,7 @@ namespace xl
 	{
 		if ( _buf_len < len )
 		{
-			ATLASSERT(FALSE);
+			assert(false);
 			return;
 		}
 		_buf_ptr += len;

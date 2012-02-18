@@ -1,23 +1,33 @@
-#ifndef MOBILECOMMANDS_H
-#define MOBILECOMMANDS_H
+#ifndef __MOBILE_COMMANDS_H_
+#define __MOBILE_COMMANDS_H_
 
-//#pragma once 
+//#pragma once
 #include "TransByteOrderStream.h"
+
+/**
+** 源文件： MobileCommands.h MobileCommands.cpp MobileCommandsTest.cpp
+** 引用文件：TransByteOrderStream.h TransByteOrderStream.cpp
+** 功能说明：协议编解码示例，如手机通讯交互协议，以下包含多条交互命令，通信数据以字节流编解码完成。
+** 详细设计参见相关代码。类似协议的制定，可参考这样的设计模式。使用到类型TransByteOrderStream的编解码处理。
+** 作者：junkun huang
+** 日期：2010-12-11 /
+*/
+
 //////////////////////////////////////////////////////////////////////////
-// namespace test_namespace
-// {
+namespace xl
+{
+
+	//////////////////////////////////////////////////////////////////////////
 
 	typedef xl::uint8  uint8;
 	typedef xl::uint16 uint16;
 	typedef xl::uint32 uint32;
 	typedef xl::uint64 uint64;
 
-#define BOOL uint32 //由于这里会与windows BOOL冲突，所以定义宏BOOL
 
 	const int SIZE_OF_UINT16 = sizeof(uint16);
 	const int SIZE_OF_UINT32 = sizeof(uint32);
 	const int SIZE_OF_UINT64 = sizeof(uint64);
-	//////////////////////////////////////////////////////////////////////////
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -57,30 +67,33 @@
 	const uint32 MOBILE_RESPONSE_GET_FILE_SIZE = 130;
 
 	//////////////////////////////////////////////////////////////////////////
+
 	/// mobile commands' based class --- CCommandBase
 	struct CCommandBase
 	{
-		typedef xl::uint16	uint16;
-		typedef xl::uint32	uint32;
-		typedef xl::uint64	uint64;
-		typedef uint32		BOOL;
+		typedef xl::uint8   UInt8;
+		typedef xl::uint16	UInt16;
+		typedef xl::uint32	UInt32;
+		typedef xl::uint64	UInt64;
+		typedef xl::uint32	Bool;
 		typedef std::string String;
-		
+
 
 		// 		template <typename T>
 		// 		class Array : public std::vector<T> {};
-#define Array std::vector	
+		//#define Array std::vector
 
-		uint32    m_protocol_version;
-		uint32    m_sequence;
-		uint32    m_command_length;
+		UInt32    m_protocol_version;
+		UInt32    m_sequence;
+		UInt32    m_command_length;
 
 		virtual ~CCommandBase() {}
 	protected:
 		char* TransByteOrderAndWrite(char* pOutData, unsigned length);
 		char* TransByteOrderAndRead(char* pOutData, unsigned length);
 	public:
-		unsigned Length() const;
+		static unsigned SizeOf();
+		virtual unsigned Length() const;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -88,15 +101,15 @@
 	struct CCommandRequestBase : public CCommandBase
 	{
 		typedef CCommandBase CBase;
-		uint32	m_command_name;
-		uint32	m_command_flag;
-		uint32	m_priority_level;
+		UInt32	m_command_name;
+		UInt32	m_command_flag;
+		UInt32	m_priority_level;
 
 		// 		CCommandRequestBase()
 		// 			: m_command_name(0), m_command_flag(0) {}
-		CCommandRequestBase(uint32 name)
+		CCommandRequestBase(UInt32 name)
 			: m_command_name(name), m_command_flag(0) {}
-			CCommandRequestBase(uint32 name, uint32 flag)
+			CCommandRequestBase(UInt32 name, UInt32 flag)
 				: m_command_name(name), m_command_flag(flag) {}
 	protected:
 		char* TransByteOrderAndWrite(char* pOutData, unsigned length);
@@ -104,8 +117,9 @@
 		//覆盖基类该方法并在子类禁用
 		char* TransByteOrderAndRead(char* pOutData, unsigned length);
 	public:
-		unsigned Length() const;
-		bool SetPriority(uint32 priority);
+		static unsigned SizeOf();
+		virtual unsigned Length() const;
+		bool SetPriority(UInt32 priority);
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -114,15 +128,15 @@
 	{
 		typedef CCommandBase CBase;
 
-		uint32    m_command_name;
-		uint32    m_command_flag;
-		BOOL      m_result;
+		UInt32    m_command_name;
+		UInt32    m_command_flag;
+		Bool      m_result;
 
 		// 		CCommandResponseBase()
 		// 			: m_command_name(0), m_command_flag(0) {}
-		CCommandResponseBase(uint32 name)
+		CCommandResponseBase(UInt32 name)
 			: m_command_name(name), m_command_flag(0) {}
-			CCommandResponseBase(uint32 name, uint32 flag)
+			CCommandResponseBase(UInt32 name, UInt32 flag)
 				: m_command_name(name), m_command_flag(flag) {}
 	protected:
 		char* TransByteOrderAndRead(char* pOutData, unsigned length);
@@ -131,7 +145,8 @@
 		char* TransByteOrderAndWrite(char* pOutData, unsigned length);
 
 	public:
-		unsigned Length() const;
+		static unsigned SizeOf();
+		virtual unsigned Length() const;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -139,7 +154,7 @@
 	struct CErrorResponse : public CCommandResponseBase
 	{
 		typedef CCommandResponseBase CBase;
-		uint32 m_error_code;
+		UInt32 m_error_code;
 
 		CErrorResponse()
 			:CCommandResponseBase(MOBILE_RESPONSE_ERROR)
@@ -213,7 +228,7 @@
 
 	struct CListPartitionResponse : public CCommandResponseBase
 	{
-		Array<uint32> m_partitions;
+		std::vector<UInt32> m_partitions;
 
 		typedef CCommandResponseBase CBase;
 		CListPartitionResponse()
@@ -229,7 +244,7 @@
 	struct CGetPatitionInfoRequest : public CCommandRequestBase
 	{
 		typedef CCommandRequestBase CBase;
-		uint32	m_partition_index;
+		UInt32	m_partition_index;
 
 		CGetPatitionInfoRequest()
 			: CCommandRequestBase(MOBILE_REQUEST_GET_PARTITION_INFO)
@@ -241,8 +256,8 @@
 
 	struct CGetPatitionInfoResponse : public CCommandResponseBase
 	{
-		uint64	m_patition_total_size;
-		uint64	m_partition_remain_size;
+		UInt64	m_patition_total_size;
+		UInt64	m_partition_remain_size;
 
 		typedef CCommandResponseBase CBase;
 		CGetPatitionInfoResponse()
@@ -257,24 +272,26 @@
 	/// 6，	List目录
 	struct CFileStruct
 	{
-		typedef CCommandBase::String String;
+		typedef CCommandBase::String	String;
+		typedef CCommandBase::Bool		Bool;
 		uint32	m_struct_length;
 		String	m_file_name;
 		uint64	m_file_size;
-		BOOL	m_is_folder;
-		BOOL	m_is_visible;
-		BOOL	m_is_writable;
+		Bool	m_is_folder;
+		Bool	m_is_visible;
+		Bool	m_is_writable;
 		String	m_file_type;
 		String	m_modify_time;
 		String	m_create_time;
 
-		CFileStruct() {}
-		CFileStruct(const CFileStruct& obj)
-			: m_struct_length(obj.m_struct_length), m_file_name(obj.m_file_name),
-			m_file_size(obj.m_file_size), m_is_folder(obj.m_is_folder),
-			m_is_visible(obj.m_is_visible), m_file_type(obj.m_file_type),
-			m_modify_time(obj.m_modify_time), m_create_time(obj.m_create_time)
-		{}
+		// 		CFileStruct() {}
+		// 		CFileStruct(const CFileStruct& obj)
+		// 			: m_struct_length(obj.m_struct_length), m_file_name(obj.m_file_name),
+		// 			m_file_size(obj.m_file_size), m_is_folder(obj.m_is_folder),
+		// 			m_is_visible(obj.m_is_visible), m_is_writable(obj.m_is_writable),
+		// 			m_file_type(obj.m_file_type),
+		// 			m_modify_time(obj.m_modify_time), m_create_time(obj.m_create_time)
+		// 		{}
 
 		unsigned Length() const;
 
@@ -287,9 +304,9 @@
 
 	struct CListPathRequest : public CCommandRequestBase
 	{
-		uint32 m_partition_index;
+		UInt32 m_partition_index;
 		String m_path_name;
-		uint32 m_file_mask;
+		UInt32 m_file_mask;
 
 		typedef CCommandRequestBase CBase;
 		CListPathRequest()
@@ -302,7 +319,7 @@
 
 	struct CListPathResponse : public CCommandResponseBase
 	{
-		Array<CFileStruct> m_file_structs;
+		std::vector<CFileStruct> m_file_array;
 
 		typedef CCommandResponseBase CBase;
 		CListPathResponse()
@@ -317,7 +334,7 @@
 	/// 7，	删除文件
 	struct CDeleteFileRequest : public CCommandRequestBase
 	{
-		uint32	m_partition_index;
+		UInt32	m_partition_index;
 		String	m_full_filename;
 
 		typedef CCommandRequestBase CBase;
@@ -344,7 +361,7 @@
 	/// 8，	重命名文件
 	struct CRenameFileRequest : public CCommandRequestBase
 	{
-		uint32	m_partition_index;
+		UInt32	m_partition_index;
 		String	m_old_filename;
 		String	m_new_filename;
 
@@ -372,9 +389,9 @@
 	/// 9，	查看文件是否存在
 	struct CIsExistFileRequest : public CCommandRequestBase
 	{
-		uint32	m_partition_index;
+		UInt32	m_partition_index;
 		String	m_full_filename;
-		BOOL	m_is_file;
+		Bool	m_is_file;
 
 		typedef CCommandRequestBase CBase;
 		CIsExistFileRequest()
@@ -387,7 +404,7 @@
 
 	struct CIsExistFileResponse : public CCommandResponseBase
 	{
-		BOOL m_is_exist;
+		Bool m_is_exist;
 
 		typedef CCommandResponseBase CBase;
 		CIsExistFileResponse()
@@ -402,9 +419,9 @@
 	/// 10，获取视频和音频信息
 	struct CGetMediaInfoRequest : public CCommandRequestBase
 	{
-		uint32	m_partition_index;
+		UInt32	m_partition_index;
 		String	m_full_filename;
-		BOOL	m_is_audio;
+		Bool	m_is_audio;
 
 		typedef CCommandRequestBase CBase;
 		CGetMediaInfoRequest()
@@ -421,10 +438,10 @@
 		String	m_audio_format;
 		String	m_vedio_format;
 		String	m_vedio_width_height;
-		uint32	m_tatol_bitrate;
-		uint32	m_audio_frequence;
-		uint32	m_audio_bitrate;
-		uint32	m_frames_per;
+		UInt32	m_tatol_bitrate;
+		UInt32	m_audio_frequence;
+		UInt32	m_audio_bitrate;
+		UInt32	m_frames_per;
 
 		typedef CCommandResponseBase CBase;
 		CGetMediaInfoResponse()
@@ -439,14 +456,14 @@
 	/// 11，视频截图并获取视频信息（截图和获取视频信息没必要连发两个命令）
 	struct CCaptureFromVedioRequest : public CCommandRequestBase
 	{
-		uint32	m_partition_index;
+		UInt32	m_partition_index;
 		String	m_src_filename;
 		String	m_picture_format;
-		uint32	m_width;
-		uint32	m_height;
-		uint32	m_begin_second;
-		BOOL	m_keep_ratio;
-		uint32	m_backgroud;
+		UInt32	m_width;
+		UInt32	m_height;
+		UInt32	m_begin_second;
+		Bool	m_keep_ratio;
+		UInt32	m_backgroud;
 
 		typedef CCommandRequestBase CBase;
 		CCaptureFromVedioRequest()
@@ -464,10 +481,10 @@
 		String	m_audio_format;
 		String	m_vedio_format;
 		String	m_vedio_width_height;
-		uint32	m_tatol_bitrate;
-		uint32	m_audio_frequence;
-		uint32	m_audio_bitrate;
-		uint32	m_frames_per;
+		UInt32	m_tatol_bitrate;
+		UInt32	m_audio_frequence;
+		UInt32	m_audio_bitrate;
+		UInt32	m_frames_per;
 
 		typedef CCommandResponseBase CBase;
 		CCaptureFromVedioResponse()
@@ -482,13 +499,13 @@
 	/// 12，图片截图（大图转小图
 	struct CCaptureFromeImageRequest : public CCommandRequestBase
 	{
-		uint32	m_partition_index;
+		UInt32	m_partition_index;
 		String	m_src_filename;
 		String	m_picture_format;
-		uint32	m_width;
-		uint32	m_height;
-		BOOL	m_keep_ratio;
-		uint32	m_backgroud;
+		UInt32	m_width;
+		UInt32	m_height;
+		Bool	m_keep_ratio;
+		UInt32	m_backgroud;
 
 		typedef CCommandRequestBase CBase;
 		CCaptureFromeImageRequest()
@@ -535,7 +552,7 @@
 
 			return outs;
 		}
-		unsigned Length() const 
+		unsigned Length() const
 		{
 			return sizeof(m_length) + \
 				sizeof(m_total_file_size) + \
@@ -544,10 +561,10 @@
 	};
 	struct CFindFilesRequest : public CCommandRequestBase
 	{
-		uint32	m_partition_index;
+		UInt32	m_partition_index;
 		String	m_path_name;
-		BOOL	m_need_recursion;
-		Array< Array<String> > m_type_array;
+		Bool	m_need_recursion;
+		std::vector< std::vector<String> > m_type_array;
 
 		typedef CCommandRequestBase CBase;
 		CFindFilesRequest()
@@ -560,7 +577,7 @@
 
 	struct CFindFileResponse : public CCommandResponseBase
 	{
-		Array<CTypeCalc>	m_type_collection;
+		std::vector<CTypeCalc>	m_type_collection;
 
 		typedef CCommandResponseBase CBase;
 		CFindFileResponse()
@@ -575,7 +592,7 @@
 	/// 14，获取mp3文件信息
 	struct CGetMP3InfoRequest : public CCommandRequestBase
 	{
-		uint32	m_partition_index;
+		UInt32	m_partition_index;
 		String	m_full_filename;
 
 		typedef CCommandRequestBase CBase;
@@ -606,10 +623,10 @@
 	/// 15，	发送文件到手机（发送文件数据包命令）
 	struct CSendFileRequest : public CCommandRequestBase
 	{
-		uint32	m_partition_index;
+		UInt32	m_partition_index;
 		String	m_dst_filename;
-		uint64	m_file_size;
-		uint64	m_offset;
+		UInt64	m_file_size;
+		UInt64	m_offset;
 		String	m_file_content;//string 表示文件内容不合适
 
 		typedef CCommandRequestBase CBase;
@@ -624,8 +641,8 @@
 
 	struct CSendFileResponse : public CCommandResponseBase
 	{
-		uint64	m_success_offset;
-		uint64	m_success_length;
+		UInt64	m_success_offset;
+		UInt64	m_success_length;
 
 		typedef CCommandResponseBase CBase;
 		CSendFileResponse()
@@ -640,7 +657,7 @@
 	/// 16，	从手机接收文件（接收文件数据包命令）
 	struct CRecvFileRequest : public CCommandRequestBase
 	{
-		uint32	m_partition_index;
+		UInt32	m_partition_index;
 		String	m_src_filename;
 
 		typedef CCommandRequestBase CBase;
@@ -655,12 +672,12 @@
 
 	struct CRecvFileResponse : public CCommandResponseBase
 	{
-		uint64	m_file_size;
-		uint64	m_offset;
+		UInt64	m_file_size;
+		UInt64	m_offset;
 		String	m_file_content;//string 表示文件内容不合适
 		typedef CCommandResponseBase CBase;
 
-		CRecvFileResponse() 
+		CRecvFileResponse()
 			: CCommandResponseBase(MOBILE_RESPONSE_RECV_FILE)
 		{}
 
@@ -672,7 +689,7 @@
 	/// 17，	查看文件大小（主连接命令）
 	struct CGetFileSizeRequest : public CCommandRequestBase
 	{
-		uint32	m_partition_index;
+		UInt32	m_partition_index;
 		String	m_full_filename;
 
 		typedef CCommandRequestBase CBase;
@@ -687,10 +704,10 @@
 
 	struct CGetFileSizeResponse : public CCommandResponseBase
 	{
-		uint64	m_file_size;
+		UInt64	m_file_size;
 		typedef CCommandResponseBase CBase;
 
-		CGetFileSizeResponse() 
+		CGetFileSizeResponse()
 			: CCommandResponseBase(MOBILE_RESPONSE_GET_FILE_SIZE)
 		{}
 
@@ -698,15 +715,28 @@
 		unsigned Length() const;
 	};
 	//////////////////////////////////////////////////////////////////////////
+	// interface ICopyCommandObject
+	// {
+	// public:
+	// 	virtual void* CopyCommandObject() const = 0;
+	// 	virtual ~ICopyCommandObject() {}
+	// };
 
 	template <typename CommandType>
-	struct CDefaultCtorHelper
+	struct CCommandWrapHelper// : public ICopyCommandObject
 	{
 		typedef CommandType CCommandType;
 
-		CDefaultCtorHelper() 
+		CCommandWrapHelper()
 			: _obj_ptr(0) {}
-			// 
+			// 	void* CopyCommandObject() const
+			// 	{
+			// 		if (_obj_ptr)
+			// 			return (new CCommandType(*_obj_ptr));
+			// 		else
+			// 			return NULL;
+			// 	}
+			//
 			// 		static CCommandBase* CreateCommandObject();
 	protected:
 		CCommandType*	_obj_ptr;
@@ -721,6 +751,7 @@
 	interface IEncodeOperation
 	{
 	public:
+		virtual CCommandRequestBase* CopyCommandObject() const = 0;
 		//设置数据，并返回encode需要的内存空间长度
 		virtual DWORD SetData(CCommandRequestBase* pInData) = 0;
 		virtual DWORD Encode(char* pOutData, unsigned length) = 0;
@@ -731,6 +762,7 @@
 	interface IDecodeOperation
 	{
 	public:
+		virtual CCommandResponseBase* CopyCommandObject() const = 0;
 		//设置数据，并返回decode需要的内存空间长度
 		virtual DWORD SetData(CCommandResponseBase* pInData) = 0;
 		virtual DWORD Decode(char* pOutData, unsigned length) = 0;
@@ -741,38 +773,73 @@
 
 	/// declaration: CHandleEncodeTemplate and CHandleDecodeTemplate...
 	template <class CRequest>
-	class CHandleEncodeTemplate : public IEncodeOperation,  public CDefaultCtorHelper<CRequest>
+	class CHandleEncodeTemplate : public IEncodeOperation,  public CCommandWrapHelper<CRequest>
 	{
+    public:
+        using CCommandWrapHelper<CRequest>::_obj_ptr;
+        typedef typename CCommandWrapHelper<CRequest>::CCommandType CCommandType;
+
 	public:
+		virtual CCommandRequestBase* CopyCommandObject() const;
+
 		virtual DWORD SetData(CCommandRequestBase* pInData);
 		virtual DWORD Encode(char* pOutData, unsigned length);
 		virtual DWORD CallBack() { return 0; }
 	};
+
 	template <class CResponse>
-	class CHandleDecodeTemplate : public IDecodeOperation,  public CDefaultCtorHelper<CResponse>
+	class CHandleDecodeTemplate : public IDecodeOperation,  public CCommandWrapHelper<CResponse>
 	{
+    public:
+        using CCommandWrapHelper<CResponse>::_obj_ptr;
+        typedef typename CCommandWrapHelper<CResponse>::CCommandType CCommandType;
+
 	public:
+		virtual CCommandResponseBase* CopyCommandObject() const;
+
 		virtual DWORD SetData(CCommandResponseBase* pInData);
 		virtual DWORD Decode(char* pOutData, unsigned length);
 		virtual DWORD CallBack() { return 0; }
 	};
 
+
 	/// implemention: template class  CHandleEncodeTemplate and CHandleDecodeTemplate...
+
+	template <class CRequest>
+		CCommandRequestBase* CHandleEncodeTemplate<CRequest>::CopyCommandObject() const
+	{
+		if (_obj_ptr)
+			return (new CCommandType(*_obj_ptr));
+		else
+			return NULL;
+	}
+
 	template <class CRequest>
 		DWORD CHandleEncodeTemplate<CRequest>::SetData(CCommandRequestBase* pInData)
-	{	
+	{
 		_obj_ptr = static_cast<CCommandType*>(pInData);
-		return TRUE;	
+		return TRUE;
 	}
 
 	template <class CRequest>
 		DWORD CHandleEncodeTemplate<CRequest>::Encode( char* pOutData, unsigned length )
 	{
-		thunder_assert(_obj_ptr);
+		assert(_obj_ptr);
+		/// TransByteOrderAndWrite 之前给请求命令长度赋值
+		_obj_ptr->m_command_length = _obj_ptr->Length();
 		char* pData = _obj_ptr->TransByteOrderAndWrite(pOutData, length);
+		assert((unsigned)(pData-pOutData) <= length);
 
-		release_assert((unsigned)(pData-pOutData) <= length);
 		return TRUE;
+	}
+
+	template <class CResponse>
+		CCommandResponseBase* CHandleDecodeTemplate<CResponse>::CopyCommandObject() const
+	{
+		if (_obj_ptr)
+			return (new CCommandType(*_obj_ptr));
+		else
+			return NULL;
 	}
 
 	template <class CResponse>
@@ -786,14 +853,16 @@
 	template <class CResponse>
 		DWORD CHandleDecodeTemplate<CResponse>::Decode( char* pOutData, unsigned length )
 	{
-		thunder_assert(_obj_ptr);
+		assert(_obj_ptr);
 		char* pData = _obj_ptr->TransByteOrderAndRead(pOutData, length);
+		/// TransByteOrderAndRead 之后给响应命令长度赋值
+		_obj_ptr->m_command_length = _obj_ptr->Length();
 
-		release_assert((unsigned)(pData-pOutData) <= length);
+		assert((unsigned)(pData-pOutData) <= length);
 		return TRUE;
 	}
 	//////////////////////////////////////////////////////////////////////////
-	/// 以下类型：处理 Encode Decode 命令对象 ///
+	/// 以下类型：处理 Encode 和 Decode 命令对象 ///
 	/// 1，	出错响应命令
 	typedef CHandleDecodeTemplate<CErrorResponse> CHandleErrorDecode;
 
@@ -807,66 +876,65 @@
 
 	/// 4，	List分区
 	typedef CHandleEncodeTemplate<CListPartitionRequest> CHandleListPartitionEncode;
-	typedef CHandleDecodeTemplate<CListPartitionResponse> CHandleListPartitionDecode;	
+	typedef CHandleDecodeTemplate<CListPartitionResponse> CHandleListPartitionDecode;
 
 	/// 5，	获取分区信息
 	typedef CHandleEncodeTemplate<CGetPatitionInfoRequest> CHandleGetPartitionInfoEncode;
-	typedef CHandleDecodeTemplate<CGetPatitionInfoResponse> CHandleGetPartitionInfoDecode;	
+	typedef CHandleDecodeTemplate<CGetPatitionInfoResponse> CHandleGetPartitionInfoDecode;
 
 	/// 6，	List目录
 	typedef CHandleEncodeTemplate<CListPathRequest> CHandleListPathEncode;
-	typedef CHandleDecodeTemplate<CListPathResponse> CHandleListPathDecode;	
+	typedef CHandleDecodeTemplate<CListPathResponse> CHandleListPathDecode;
 
 	/// 7，	删除文件
 	typedef CHandleEncodeTemplate<CDeleteFileRequest> CHandleDeleteFileEncode;
-	typedef CHandleDecodeTemplate<CDeleteFileResponse> CHandleDeleteFileDecode;	
+	typedef CHandleDecodeTemplate<CDeleteFileResponse> CHandleDeleteFileDecode;
 
 	/// 8，	重命名文件
 	typedef CHandleEncodeTemplate<CRenameFileRequest> CHandleRenameFileEncode;
-	typedef CHandleDecodeTemplate<CRenameFileResponse> CHandleRenameFileDecode;	
+	typedef CHandleDecodeTemplate<CRenameFileResponse> CHandleRenameFileDecode;
 
 	/// 9，	查看文件是否存在
 	typedef CHandleEncodeTemplate<CIsExistFileRequest> CHandleIsExistFileEncode;
-	typedef CHandleDecodeTemplate<CIsExistFileResponse> CHandleIsExistFileDecode;	
+	typedef CHandleDecodeTemplate<CIsExistFileResponse> CHandleIsExistFileDecode;
 
 	/// 10，	获取视频和音频信息
 	typedef CHandleEncodeTemplate<CGetMediaInfoRequest> CHandleGetMediaInfoEncode;
-	typedef CHandleDecodeTemplate<CGetMediaInfoResponse> CHandleGetMediaInfoDecode;	
+	typedef CHandleDecodeTemplate<CGetMediaInfoResponse> CHandleGetMediaInfoDecode;
 
 	/// 11，	视频截图并获取视频信息（截图和获取视频信息没必要连发两个命令）
 	typedef CHandleEncodeTemplate<CCaptureFromVedioRequest> CHandleCaptureFromVedioEncode;
-	typedef CHandleDecodeTemplate<CCaptureFromVedioResponse> CHandleCaptureFromVedioDecode;	
+	typedef CHandleDecodeTemplate<CCaptureFromVedioResponse> CHandleCaptureFromVedioDecode;
 
 	/// 12，	图片截图（大图转小图）
 	typedef CHandleEncodeTemplate<CCaptureFromeImageRequest> CHandleCaptureFromImageEncode;
-	typedef CHandleDecodeTemplate<CCaptureFromImageResponse> CHandleCaptureFromImageDecode;	
+	typedef CHandleDecodeTemplate<CCaptureFromImageResponse> CHandleCaptureFromImageDecode;
 
 	/// 13，	遍历搜索计算类型文件大小及个数
 	typedef CHandleEncodeTemplate<CFindFilesRequest> CHandleFindFileEncode;
-	typedef CHandleDecodeTemplate<CFindFileResponse> CHandleFindFileDecode;	
+	typedef CHandleDecodeTemplate<CFindFileResponse> CHandleFindFileDecode;
 
 	/// 14，	获取mp3文件信息
 	typedef CHandleEncodeTemplate<CGetMP3InfoRequest> CHandleGetMP3InfoEncode;
-	typedef CHandleDecodeTemplate<CGetMP3InfoResponse> CHandleGetMP3InfoDecode;	
+	typedef CHandleDecodeTemplate<CGetMP3InfoResponse> CHandleGetMP3InfoDecode;
 
 	/// 15，	发送文件到手机（发送文件数据包命令）
 	typedef CHandleEncodeTemplate<CSendFileRequest> CHandleSendFileEncode;
-	typedef CHandleDecodeTemplate<CSendFileResponse> CHandleSendFileDecode;	
+	typedef CHandleDecodeTemplate<CSendFileResponse> CHandleSendFileDecode;
 
 	/// 16，	从手机接收文件（接收文件数据包命令）
 	typedef CHandleEncodeTemplate<CRecvFileRequest> CHandleRecvFileEncode;
-	typedef CHandleDecodeTemplate<CRecvFileResponse> CHandleRecvFileDecode;	
+	typedef CHandleDecodeTemplate<CRecvFileResponse> CHandleRecvFileDecode;
 
 	/// 17，	查看文件大小（主连接命令）
 	typedef CHandleEncodeTemplate<CGetFileSizeRequest> CHandleGetFileSizeEncode;
-	typedef CHandleDecodeTemplate<CGetFileSizeResponse> CHandleGetFileSizeDecode;	
+	typedef CHandleDecodeTemplate<CGetFileSizeResponse> CHandleGetFileSizeDecode;
 	//////////////////////////////////////////////////////////////////////////
 
 
-#undef BOOL  //卸载该文件的BOOL宏定义
 
-// 
-// }// namespace test_namespace
+	//
+}// namespace xl
 
 
-#endif//MOBILECOMMANDS_H
+#endif//__MOBILE_COMMANDS_H_
