@@ -1,16 +1,19 @@
-#ifndef __MOBILE_COMMANDS_H_
+ï»¿#ifndef __MOBILE_COMMANDS_H_
 #define __MOBILE_COMMANDS_H_
 
 //#pragma once
 #include "TransByteOrderStream.h"
 
 /**
-** Ô´ÎÄ¼ş£º MobileCommands.h MobileCommands.cpp MobileCommandsTest.cpp
-** ÒıÓÃÎÄ¼ş£ºTransByteOrderStream.h TransByteOrderStream.cpp
-** ¹¦ÄÜËµÃ÷£ºĞ­Òé±à½âÂëÊ¾Àı£¬ÈçÊÖ»úÍ¨Ñ¶½»»¥Ğ­Òé£¬ÒÔÏÂ°üº¬¶àÌõ½»»¥ÃüÁî£¬Í¨ĞÅÊı¾İÒÔ×Ö½ÚÁ÷±à½âÂëÍê³É¡£
-** ÏêÏ¸Éè¼Æ²Î¼ûÏà¹Ø´úÂë¡£ÀàËÆĞ­ÒéµÄÖÆ¶¨£¬¿É²Î¿¼ÕâÑùµÄÉè¼ÆÄ£Ê½¡£Ê¹ÓÃµ½ÀàĞÍTransByteOrderStreamµÄ±à½âÂë´¦Àí¡£
-** ×÷Õß£ºjunkun huang
-** ÈÕÆÚ£º2010-12-11 /
+** æºæ–‡ä»¶ï¼š MobileCommands.h MobileCommands.cpp MobileCommandsTest.cpp
+** å¼•ç”¨æ–‡ä»¶ï¼šTransByteOrderStream.h TransByteOrderStream.cpp
+** åŠŸèƒ½è¯´æ˜ï¼šåè®®ç¼–è§£ç ç¤ºä¾‹ï¼Œå¦‚PC-æ‰‹æœºé€šè®¯äº¤äº’åè®®ï¼Œä»¥ä¸‹åŒ…å«å¤šæ¡äº¤äº’å‘½ä»¤ï¼Œé€šä¿¡æ•°æ®ä»¥å­—èŠ‚æµç¼–è§£ç å®Œæˆã€‚
+** è¯¦ç»†è®¾è®¡å‚è§ç›¸å…³ä»£ç ã€‚ç±»ä¼¼åè®®çš„åˆ¶å®šï¼Œå¯å‚è€ƒè¿™æ ·çš„è®¾è®¡æ¨¡å¼ã€‚ä½¿ç”¨åˆ°ç±»å‹TransByteOrderStreamçš„ç¼–è§£ç å¤„ç†ã€‚
+
+** btwï¼Œç”±äºå½“æ—¶é¡¹ç›®åšäº†å¤§è°ƒæ•´ï¼Œè¯¥åè®®é€‚ç”¨çš„é¡¹ç›®è¢«å«åœï¼Œæ‰€ä»¥è¿™äº›å‰æœŸæ¢ç´¢ã€æ¼”ç»ƒçš„ä»£ç ä½œåºŸï¼Œä»…ä½œä¸ºåç»­å¼€å‘ç±»ä¼¼åè®®çš„å‚è€ƒã€‚ä½†æ˜¯ï¼Œåœ¨å¼€å‘è®¾è®¡è¯¥ç¨‹åºè¿‡ç¨‹ï¼Œæ¯•ç«ŸèŠ±è´¹è¯¸å¤šå¿ƒæ€å»è®¾è®¡ä¸æ¶æ„ï¼Œç”šè‡³æœ‰æ—¶è‡ªæˆ‘é™¶é†‰ä¸€ç•ªå“ˆå“ˆï¼Œå®¢è§‚è¯´æ¥ä»£ç è¿˜ç®—è‰¯å¥½ï¼Œä¸å¦¨åœ¨æ­¤å¼€æºä¸€ç¹ä¸ºå¿«ï¼Œå¸Œæœ›å…¶ä¸­å­˜åœ¨çš„é—®é¢˜å¯ä»¥æš´éœ²å‡ºæ¥ã€‚å‘µå‘µï¼Œé¢˜å¤–è¯äº†ä¸€æŠŠã€‚
+
+** ä½œè€…ï¼šjunkun huang
+** æ—¥æœŸï¼š2010-12-11 /
 */
 
 //////////////////////////////////////////////////////////////////////////
@@ -114,7 +117,7 @@ namespace xl
 	protected:
 		char* TransByteOrderAndWrite(char* pOutData, unsigned length);
 	private:
-		//¸²¸Ç»ùÀà¸Ã·½·¨²¢ÔÚ×ÓÀà½ûÓÃ
+		//è¦†ç›–åŸºç±»è¯¥æ–¹æ³•å¹¶åœ¨å­ç±»ç¦ç”¨
 		char* TransByteOrderAndRead(char* pOutData, unsigned length);
 	public:
 		static unsigned SizeOf();
@@ -141,7 +144,7 @@ namespace xl
 	protected:
 		char* TransByteOrderAndRead(char* pOutData, unsigned length);
 	private:
-		//¸²¸Ç»ùÀà¸Ã·½·¨²¢ÔÚ×ÓÀà½ûÓÃ
+		//è¦†ç›–åŸºç±»è¯¥æ–¹æ³•å¹¶åœ¨å­ç±»ç¦ç”¨
 		char* TransByteOrderAndWrite(char* pOutData, unsigned length);
 
 	public:
@@ -150,7 +153,7 @@ namespace xl
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	/// 1£¬	³ö´íÏìÓ¦ÃüÁî
+	/// 1ï¼Œ	å‡ºé”™å“åº”å‘½ä»¤
 	struct CErrorResponse : public CCommandResponseBase
 	{
 		typedef CCommandResponseBase CBase;
@@ -164,7 +167,7 @@ namespace xl
 		unsigned Length() const;
 	};
 	//////////////////////////////////////////////////////////////////////////
-	/// 2£¬	µÇÂ¼ÃüÁî£¨Ô¤Áô¸øwifi£©
+	/// 2ï¼Œ	ç™»å½•å‘½ä»¤ï¼ˆé¢„ç•™ç»™wifiï¼‰
 	struct CLogWifiRequest : public CCommandRequestBase
 	{
 		String m_password;
@@ -192,7 +195,7 @@ namespace xl
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	/// 3£¬	ĞÄÌøÃüÁî
+	/// 3ï¼Œ	å¿ƒè·³å‘½ä»¤
 	struct CTimeTickRequset : public CCommandRequestBase
 	{
 		typedef CCommandRequestBase CBase;
@@ -214,7 +217,7 @@ namespace xl
 		unsigned Length() const;
 	};
 	//////////////////////////////////////////////////////////////////////////
-	/// 4£¬	List·ÖÇø
+	/// 4ï¼Œ	Liståˆ†åŒº
 	struct CListPartitionRequest : public CCommandRequestBase
 	{
 		typedef CCommandRequestBase CBase;
@@ -240,7 +243,7 @@ namespace xl
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	/// 5£¬	»ñÈ¡·ÖÇøĞÅÏ¢
+	/// 5ï¼Œ	è·å–åˆ†åŒºä¿¡æ¯
 	struct CGetPatitionInfoRequest : public CCommandRequestBase
 	{
 		typedef CCommandRequestBase CBase;
@@ -269,7 +272,7 @@ namespace xl
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	/// 6£¬	ListÄ¿Â¼
+	/// 6ï¼Œ	Listç›®å½•
 	struct CFileStruct
 	{
 		typedef CCommandBase::String	String;
@@ -331,7 +334,7 @@ namespace xl
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	/// 7£¬	É¾³ıÎÄ¼ş
+	/// 7ï¼Œ	åˆ é™¤æ–‡ä»¶
 	struct CDeleteFileRequest : public CCommandRequestBase
 	{
 		UInt32	m_partition_index;
@@ -358,7 +361,7 @@ namespace xl
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	/// 8£¬	ÖØÃüÃûÎÄ¼ş
+	/// 8ï¼Œ	é‡å‘½åæ–‡ä»¶
 	struct CRenameFileRequest : public CCommandRequestBase
 	{
 		UInt32	m_partition_index;
@@ -386,7 +389,7 @@ namespace xl
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	/// 9£¬	²é¿´ÎÄ¼şÊÇ·ñ´æÔÚ
+	/// 9ï¼Œ	æŸ¥çœ‹æ–‡ä»¶æ˜¯å¦å­˜åœ¨
 	struct CIsExistFileRequest : public CCommandRequestBase
 	{
 		UInt32	m_partition_index;
@@ -416,7 +419,7 @@ namespace xl
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	/// 10£¬»ñÈ¡ÊÓÆµºÍÒôÆµĞÅÏ¢
+	/// 10ï¼Œè·å–è§†é¢‘å’ŒéŸ³é¢‘ä¿¡æ¯
 	struct CGetMediaInfoRequest : public CCommandRequestBase
 	{
 		UInt32	m_partition_index;
@@ -453,7 +456,7 @@ namespace xl
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	/// 11£¬ÊÓÆµ½ØÍ¼²¢»ñÈ¡ÊÓÆµĞÅÏ¢£¨½ØÍ¼ºÍ»ñÈ¡ÊÓÆµĞÅÏ¢Ã»±ØÒªÁ¬·¢Á½¸öÃüÁî£©
+	/// 11ï¼Œè§†é¢‘æˆªå›¾å¹¶è·å–è§†é¢‘ä¿¡æ¯ï¼ˆæˆªå›¾å’Œè·å–è§†é¢‘ä¿¡æ¯æ²¡å¿…è¦è¿å‘ä¸¤ä¸ªå‘½ä»¤ï¼‰
 	struct CCaptureFromVedioRequest : public CCommandRequestBase
 	{
 		UInt32	m_partition_index;
@@ -496,7 +499,7 @@ namespace xl
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	/// 12£¬Í¼Æ¬½ØÍ¼£¨´óÍ¼×ªĞ¡Í¼
+	/// 12ï¼Œå›¾ç‰‡æˆªå›¾ï¼ˆå¤§å›¾è½¬å°å›¾
 	struct CCaptureFromeImageRequest : public CCommandRequestBase
 	{
 		UInt32	m_partition_index;
@@ -529,7 +532,7 @@ namespace xl
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	/// 13£¬±éÀúËÑË÷¼ÆËãÀàĞÍÎÄ¼ş´óĞ¡¼°¸öÊı
+	/// 13ï¼Œéå†æœç´¢è®¡ç®—ç±»å‹æ–‡ä»¶å¤§å°åŠä¸ªæ•°
 	struct CTypeCalc
 	{
 		uint32	m_length;
@@ -589,7 +592,7 @@ namespace xl
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	/// 14£¬»ñÈ¡mp3ÎÄ¼şĞÅÏ¢
+	/// 14ï¼Œè·å–mp3æ–‡ä»¶ä¿¡æ¯
 	struct CGetMP3InfoRequest : public CCommandRequestBase
 	{
 		UInt32	m_partition_index;
@@ -620,14 +623,14 @@ namespace xl
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	/// 15£¬	·¢ËÍÎÄ¼şµ½ÊÖ»ú£¨·¢ËÍÎÄ¼şÊı¾İ°üÃüÁî£©
+	/// 15ï¼Œ	å‘é€æ–‡ä»¶åˆ°æ‰‹æœºï¼ˆå‘é€æ–‡ä»¶æ•°æ®åŒ…å‘½ä»¤ï¼‰
 	struct CSendFileRequest : public CCommandRequestBase
 	{
 		UInt32	m_partition_index;
 		String	m_dst_filename;
 		UInt64	m_file_size;
 		UInt64	m_offset;
-		String	m_file_content;//string ±íÊ¾ÎÄ¼şÄÚÈİ²»ºÏÊÊ
+		String	m_file_content;//string è¡¨ç¤ºæ–‡ä»¶å†…å®¹ä¸åˆé€‚
 
 		typedef CCommandRequestBase CBase;
 
@@ -654,7 +657,7 @@ namespace xl
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	/// 16£¬	´ÓÊÖ»ú½ÓÊÕÎÄ¼ş£¨½ÓÊÕÎÄ¼şÊı¾İ°üÃüÁî£©
+	/// 16ï¼Œ	ä»æ‰‹æœºæ¥æ”¶æ–‡ä»¶ï¼ˆæ¥æ”¶æ–‡ä»¶æ•°æ®åŒ…å‘½ä»¤ï¼‰
 	struct CRecvFileRequest : public CCommandRequestBase
 	{
 		UInt32	m_partition_index;
@@ -674,7 +677,7 @@ namespace xl
 	{
 		UInt64	m_file_size;
 		UInt64	m_offset;
-		String	m_file_content;//string ±íÊ¾ÎÄ¼şÄÚÈİ²»ºÏÊÊ
+		String	m_file_content;//string è¡¨ç¤ºæ–‡ä»¶å†…å®¹ä¸åˆé€‚
 		typedef CCommandResponseBase CBase;
 
 		CRecvFileResponse()
@@ -686,7 +689,7 @@ namespace xl
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	/// 17£¬	²é¿´ÎÄ¼ş´óĞ¡£¨Ö÷Á¬½ÓÃüÁî£©
+	/// 17ï¼Œ	æŸ¥çœ‹æ–‡ä»¶å¤§å°ï¼ˆä¸»è¿æ¥å‘½ä»¤ï¼‰
 	struct CGetFileSizeRequest : public CCommandRequestBase
 	{
 		UInt32	m_partition_index;
@@ -752,7 +755,7 @@ namespace xl
 	{
 	public:
 		virtual CCommandRequestBase* CopyCommandObject() const = 0;
-		//ÉèÖÃÊı¾İ£¬²¢·µ»ØencodeĞèÒªµÄÄÚ´æ¿Õ¼ä³¤¶È
+		//è®¾ç½®æ•°æ®ï¼Œå¹¶è¿”å›encodeéœ€è¦çš„å†…å­˜ç©ºé—´é•¿åº¦
 		virtual DWORD SetData(CCommandRequestBase* pInData) = 0;
 		virtual DWORD Encode(char* pOutData, unsigned length) = 0;
 		virtual DWORD CallBack() = 0;
@@ -763,7 +766,7 @@ namespace xl
 	{
 	public:
 		virtual CCommandResponseBase* CopyCommandObject() const = 0;
-		//ÉèÖÃÊı¾İ£¬²¢·µ»ØdecodeĞèÒªµÄÄÚ´æ¿Õ¼ä³¤¶È
+		//è®¾ç½®æ•°æ®ï¼Œå¹¶è¿”å›decodeéœ€è¦çš„å†…å­˜ç©ºé—´é•¿åº¦
 		virtual DWORD SetData(CCommandResponseBase* pInData) = 0;
 		virtual DWORD Decode(char* pOutData, unsigned length) = 0;
 		virtual DWORD CallBack() = 0;
@@ -825,7 +828,7 @@ namespace xl
 		DWORD CHandleEncodeTemplate<CRequest>::Encode( char* pOutData, unsigned length )
 	{
 		assert(_obj_ptr);
-		/// TransByteOrderAndWrite Ö®Ç°¸øÇëÇóÃüÁî³¤¶È¸³Öµ
+		/// TransByteOrderAndWrite ä¹‹å‰ç»™è¯·æ±‚å‘½ä»¤é•¿åº¦èµ‹å€¼
 		_obj_ptr->m_command_length = _obj_ptr->Length();
 		char* pData = _obj_ptr->TransByteOrderAndWrite(pOutData, length);
 		assert((unsigned)(pData-pOutData) <= length);
@@ -855,78 +858,78 @@ namespace xl
 	{
 		assert(_obj_ptr);
 		char* pData = _obj_ptr->TransByteOrderAndRead(pOutData, length);
-		/// TransByteOrderAndRead Ö®ºó¸øÏìÓ¦ÃüÁî³¤¶È¸³Öµ
+		/// TransByteOrderAndRead ä¹‹åç»™å“åº”å‘½ä»¤é•¿åº¦èµ‹å€¼
 		_obj_ptr->m_command_length = _obj_ptr->Length();
 
 		assert((unsigned)(pData-pOutData) <= length);
 		return TRUE;
 	}
 	//////////////////////////////////////////////////////////////////////////
-	/// ÒÔÏÂÀàĞÍ£º´¦Àí Encode ºÍ Decode ÃüÁî¶ÔÏó ///
-	/// 1£¬	³ö´íÏìÓ¦ÃüÁî
+	/// ä»¥ä¸‹ç±»å‹ï¼šå¤„ç† Encode å’Œ Decode å‘½ä»¤å¯¹è±¡ ///
+	/// 1ï¼Œ	å‡ºé”™å“åº”å‘½ä»¤
 	typedef CHandleDecodeTemplate<CErrorResponse> CHandleErrorDecode;
 
-	/// 2£¬	WifiµÇÂ¼£¨usbÄ£Ê½²»»á·¢ËÍ£©
+	/// 2ï¼Œ	Wifiç™»å½•ï¼ˆusbæ¨¡å¼ä¸ä¼šå‘é€ï¼‰
 	typedef CHandleEncodeTemplate<CLogWifiRequest> CHandleLogWifiEncode;
 	typedef CHandleDecodeTemplate<CLogWifiResponse> CHandleLogWifiDecode;
 
-	/// 3£¬	ĞÄÌøÃüÁî
+	/// 3ï¼Œ	å¿ƒè·³å‘½ä»¤
 	typedef CHandleEncodeTemplate<CTimeTickRequset> CHandleTimeTickEncode;
 	typedef CHandleDecodeTemplate<CTimeTickResponse> CHandleTimeTickDecode;
 
-	/// 4£¬	List·ÖÇø
+	/// 4ï¼Œ	Liståˆ†åŒº
 	typedef CHandleEncodeTemplate<CListPartitionRequest> CHandleListPartitionEncode;
 	typedef CHandleDecodeTemplate<CListPartitionResponse> CHandleListPartitionDecode;
 
-	/// 5£¬	»ñÈ¡·ÖÇøĞÅÏ¢
+	/// 5ï¼Œ	è·å–åˆ†åŒºä¿¡æ¯
 	typedef CHandleEncodeTemplate<CGetPatitionInfoRequest> CHandleGetPartitionInfoEncode;
 	typedef CHandleDecodeTemplate<CGetPatitionInfoResponse> CHandleGetPartitionInfoDecode;
 
-	/// 6£¬	ListÄ¿Â¼
+	/// 6ï¼Œ	Listç›®å½•
 	typedef CHandleEncodeTemplate<CListPathRequest> CHandleListPathEncode;
 	typedef CHandleDecodeTemplate<CListPathResponse> CHandleListPathDecode;
 
-	/// 7£¬	É¾³ıÎÄ¼ş
+	/// 7ï¼Œ	åˆ é™¤æ–‡ä»¶
 	typedef CHandleEncodeTemplate<CDeleteFileRequest> CHandleDeleteFileEncode;
 	typedef CHandleDecodeTemplate<CDeleteFileResponse> CHandleDeleteFileDecode;
 
-	/// 8£¬	ÖØÃüÃûÎÄ¼ş
+	/// 8ï¼Œ	é‡å‘½åæ–‡ä»¶
 	typedef CHandleEncodeTemplate<CRenameFileRequest> CHandleRenameFileEncode;
 	typedef CHandleDecodeTemplate<CRenameFileResponse> CHandleRenameFileDecode;
 
-	/// 9£¬	²é¿´ÎÄ¼şÊÇ·ñ´æÔÚ
+	/// 9ï¼Œ	æŸ¥çœ‹æ–‡ä»¶æ˜¯å¦å­˜åœ¨
 	typedef CHandleEncodeTemplate<CIsExistFileRequest> CHandleIsExistFileEncode;
 	typedef CHandleDecodeTemplate<CIsExistFileResponse> CHandleIsExistFileDecode;
 
-	/// 10£¬	»ñÈ¡ÊÓÆµºÍÒôÆµĞÅÏ¢
+	/// 10ï¼Œ	è·å–è§†é¢‘å’ŒéŸ³é¢‘ä¿¡æ¯
 	typedef CHandleEncodeTemplate<CGetMediaInfoRequest> CHandleGetMediaInfoEncode;
 	typedef CHandleDecodeTemplate<CGetMediaInfoResponse> CHandleGetMediaInfoDecode;
 
-	/// 11£¬	ÊÓÆµ½ØÍ¼²¢»ñÈ¡ÊÓÆµĞÅÏ¢£¨½ØÍ¼ºÍ»ñÈ¡ÊÓÆµĞÅÏ¢Ã»±ØÒªÁ¬·¢Á½¸öÃüÁî£©
+	/// 11ï¼Œ	è§†é¢‘æˆªå›¾å¹¶è·å–è§†é¢‘ä¿¡æ¯ï¼ˆæˆªå›¾å’Œè·å–è§†é¢‘ä¿¡æ¯æ²¡å¿…è¦è¿å‘ä¸¤ä¸ªå‘½ä»¤ï¼‰
 	typedef CHandleEncodeTemplate<CCaptureFromVedioRequest> CHandleCaptureFromVedioEncode;
 	typedef CHandleDecodeTemplate<CCaptureFromVedioResponse> CHandleCaptureFromVedioDecode;
 
-	/// 12£¬	Í¼Æ¬½ØÍ¼£¨´óÍ¼×ªĞ¡Í¼£©
+	/// 12ï¼Œ	å›¾ç‰‡æˆªå›¾ï¼ˆå¤§å›¾è½¬å°å›¾ï¼‰
 	typedef CHandleEncodeTemplate<CCaptureFromeImageRequest> CHandleCaptureFromImageEncode;
 	typedef CHandleDecodeTemplate<CCaptureFromImageResponse> CHandleCaptureFromImageDecode;
 
-	/// 13£¬	±éÀúËÑË÷¼ÆËãÀàĞÍÎÄ¼ş´óĞ¡¼°¸öÊı
+	/// 13ï¼Œ	éå†æœç´¢è®¡ç®—ç±»å‹æ–‡ä»¶å¤§å°åŠä¸ªæ•°
 	typedef CHandleEncodeTemplate<CFindFilesRequest> CHandleFindFileEncode;
 	typedef CHandleDecodeTemplate<CFindFileResponse> CHandleFindFileDecode;
 
-	/// 14£¬	»ñÈ¡mp3ÎÄ¼şĞÅÏ¢
+	/// 14ï¼Œ	è·å–mp3æ–‡ä»¶ä¿¡æ¯
 	typedef CHandleEncodeTemplate<CGetMP3InfoRequest> CHandleGetMP3InfoEncode;
 	typedef CHandleDecodeTemplate<CGetMP3InfoResponse> CHandleGetMP3InfoDecode;
 
-	/// 15£¬	·¢ËÍÎÄ¼şµ½ÊÖ»ú£¨·¢ËÍÎÄ¼şÊı¾İ°üÃüÁî£©
+	/// 15ï¼Œ	å‘é€æ–‡ä»¶åˆ°æ‰‹æœºï¼ˆå‘é€æ–‡ä»¶æ•°æ®åŒ…å‘½ä»¤ï¼‰
 	typedef CHandleEncodeTemplate<CSendFileRequest> CHandleSendFileEncode;
 	typedef CHandleDecodeTemplate<CSendFileResponse> CHandleSendFileDecode;
 
-	/// 16£¬	´ÓÊÖ»ú½ÓÊÕÎÄ¼ş£¨½ÓÊÕÎÄ¼şÊı¾İ°üÃüÁî£©
+	/// 16ï¼Œ	ä»æ‰‹æœºæ¥æ”¶æ–‡ä»¶ï¼ˆæ¥æ”¶æ–‡ä»¶æ•°æ®åŒ…å‘½ä»¤ï¼‰
 	typedef CHandleEncodeTemplate<CRecvFileRequest> CHandleRecvFileEncode;
 	typedef CHandleDecodeTemplate<CRecvFileResponse> CHandleRecvFileDecode;
 
-	/// 17£¬	²é¿´ÎÄ¼ş´óĞ¡£¨Ö÷Á¬½ÓÃüÁî£©
+	/// 17ï¼Œ	æŸ¥çœ‹æ–‡ä»¶å¤§å°ï¼ˆä¸»è¿æ¥å‘½ä»¤ï¼‰
 	typedef CHandleEncodeTemplate<CGetFileSizeRequest> CHandleGetFileSizeEncode;
 	typedef CHandleDecodeTemplate<CGetFileSizeResponse> CHandleGetFileSizeDecode;
 	//////////////////////////////////////////////////////////////////////////
