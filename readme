@@ -55,7 +55,7 @@
 
 ## 7. 
 /**
-** 源文件： win32_sync_func.h, win32_sync_func_test.cpp
+** 源文件： win_sync_func.h, win_sync_func_test.cpp
 ** 功能说明：
 ** #1：先抽象基类型locker，然后派生不同子类型mutex，event，critical_section，semaphore四款常用的锁，均实用于需要同步操作情况。
 ** 注意：其中类型critical_section非WIN内核对象区别于其他类型内核对象，其包含成员数据稍微不同。
@@ -82,7 +82,7 @@
 
 ## 5.
 /**
-** 源文件： win32_timer_class.h, win32_timer_class_test.cpp
+** 源文件： win_timer_class.h, win_timer_class_test.cpp
 ** 封装WIN定时器操作API，抽象实现timer类型，方便使用。
 **
 ** 作者：junkun huang
@@ -91,7 +91,7 @@
 
 ## 4.
 /**
-** 源文件： win32_thread_class.h, win32_thrad_class_test.cpp
+** 源文件： win_thread_class.h, win_thrad_class_test.cpp
 ** 功能描述：封装WIN线程API，抽象实现线程基类thread_base。
 ** 方便用于定制具体操作的线程子类。
 **

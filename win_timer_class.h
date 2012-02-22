@@ -1,5 +1,5 @@
-#ifndef TIMER_CLASS_H_INCLUDED
-#define TIMER_CLASS_H_INCLUDED
+#ifndef WIN_TIMER_CLASS_H_INCLUDED
+#define WIN_TIMER_CLASS_H_INCLUDED
 
 #include <iostream>
 #include <cstdio>
@@ -37,39 +37,40 @@
 namespace test_namespace
 {
 
-class timer
+class win_timer
 {
 public:
-    typedef timer self_type;
+    typedef win_timer self_type;
     static const unsigned DEFAULT_INTERVAL_TICK = 1000;
 
 public:
-    timer()
+    win_timer()
         : _hwnd(NULL), _interval_tick(DEFAULT_INTERVAL_TICK)//
     {
         _timer_id = 0;
         reset();
     }
-    timer(unsigned tick_time)
+    win_timer(unsigned tick_time)
         : _hwnd(NULL), _interval_tick(tick_time)
     {
         _timer_id = 0;
         reset();
     }
-    timer(HWND hWnd )
+    win_timer(HWND hWnd )
         : _hwnd(hWnd), _interval_tick(DEFAULT_INTERVAL_TICK)
     {
+        std::cout << " win_timer(HWND hWnd ) ...\n";
         _timer_id = (UINT_PTR)this;
         reset();
     }
-    timer(HWND hWnd, unsigned tick_time)
+    win_timer(HWND hWnd, unsigned tick_time)
         : _hwnd(hWnd), _interval_tick(tick_time)
     {
         _timer_id = (UINT_PTR)this;
         reset();
     }
 
-    virtual ~timer()
+    virtual ~win_timer()
     {
         BOOL res = ::KillTimer(NULL, _timer_id);
         assert(TRUE == res);
@@ -79,21 +80,23 @@ public:
 protected:
     static void __stdcall s_timer_proc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)//
     {
-        //timer* this_timer = (timer*) idEvent;
-        //assert (this_timer);
-        //this_timer->handle_timeout(idEvent);
-        std::cout << "s_timer_proc ...\n";
+        std::cout << " s_timer_proc ...\n";
+        win_timer* this_timer = (win_timer*) idEvent;
+        assert (this_timer);
+        this_timer->handle_timeout(idEvent);
         return;
     }
     void reset()
     {
-        _timer_id = ::SetTimer(_hwnd, _timer_id, _interval_tick, timer::s_timer_proc);
+        std::cout << " _timer_id:" << _timer_id;
+        _timer_id = ::SetTimer(_hwnd, _timer_id, _interval_tick, s_timer_proc);//0
+        std::cout << " _timer_id:" << _timer_id << "\n";
 // 		if (NULL == hWnd)
 // 			_timer_id = (UINT_PTR)this;
         if (!_timer_id)
         {
             int res = ::GetLastError();
-            std::cout << " " << res << "\n";
+            std::cout << " GetLastError:" << res << "\n";
         }
         //assert (_timer_id);
     }
@@ -106,7 +109,11 @@ public:
     {
         return _hwnd;
     }
-    virtual void handle_timeout(unsigned timer_type);
+	unsigned interval_tick() const
+	{
+		return _interval_tick;
+	}
+    virtual void handle_timeout(unsigned timer_type) = 0;
 
 private:
     HWND	_hwnd;
@@ -114,12 +121,9 @@ private:
     unsigned _interval_tick;
 };
 
-void timer::handle_timeout(unsigned timer_type)
-{
-}
 
 
 }/// namespace test_namespace
 
 
-#endif // TIMER_CLASS_H_INCLUDED
+#endif // WIN_TIMER_CLASS_H_INCLUDED
