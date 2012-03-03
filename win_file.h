@@ -77,6 +77,8 @@ bool path_included_file_list(const basic_string<_TChar>& dir, vector<basic_strin
 {
     typedef basic_string<_TChar> _TString;
 
+    assert (!dir.empty() && _T('\\') == dir[dir.size() - 1]);
+
     WIN32_FIND_DATA	win32_find_data;
     const static basic_string<_TChar> ALL_FILE_INCLUDED(_T("*"));
     HANDLE handle =	::FindFirstFile(_TString(dir+ALL_FILE_INCLUDED).c_str(), &win32_find_data);
