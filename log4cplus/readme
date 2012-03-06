@@ -1,0 +1,15 @@
+# Something good from log4cplus.
+	List 
+config       pointer.h         socketbuffer.cxx  syncprims-pthreads.h  threads.cxx
+config.hxx   readme            socketbuffer.h    syncprims-win32.h     threads.h
+ndc.cxx      socket-win32.cxx  streams.h         syncprims.cxx         timehelper.cx
+ndc.h        socket.cxx        stringhelper.cxx  syncprims.h           timehelper.h
+pointer.cxx  socket.h          stringhelper.h    thread-config.h       tstring.h
+
+## Instructions
+
+### base 
+	config[dir]
+	
+###
+	
