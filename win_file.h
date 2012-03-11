@@ -28,6 +28,10 @@ using namespace std;
 
 class   win_file
 {
+private:
+// 把拷贝构造和赋值操作符禁用
+	win_file(const win_file&) {}
+	win_file& operator=(const win_file&) {}
 public:
     enum OPENMODE { OPEN = 0, CREATE = 1, CREATEALWAYS = 2, READ = 3 };
 

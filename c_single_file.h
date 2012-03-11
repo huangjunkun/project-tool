@@ -239,7 +239,10 @@ basic_string<_TChar>  trim_tstring(const basic_string<_TChar>& srcString)
 */
 class c_single_file
 {
-public:
+private:
+// 把拷贝构造和赋值操作符禁用
+	c_single_file(const c_single_file&) {}
+	c_single_file& operator=(const c_single_file&) {}
     //		using namespace std;
 public:
     c_single_file() : _file(0) {}
