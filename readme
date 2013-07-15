@@ -7,6 +7,18 @@
   该git工程存放，工程性的工具代码，或工作时项目开发前期测试性代码。
   每一份源码均有一段简要的说明，详见如下内容。欢迎交流，谢谢！
 
+  ## 12.
+/**
+** 源文件： range_func_test.c
+
+** 功能说明：
+	比较两个range的大小。
+	计算range_list与range，判断是否首尾重叠。
+	完整的函数实现，附完整的测试用例。
+** 作者：junkun & jieouy
+** 日期：2013-07 /
+*/
+
 ## 11.
 /**
 ** 源文件： MobileCommands.h MobileCommands.cpp MobileCommandsTest.cpp
