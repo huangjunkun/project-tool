@@ -21,7 +21,7 @@ static std::ofstream s_fout("stat_result.log", ios::app);
 static std::ostringstream s_fout_buffer;
 
 
-static const size_t FIRSTBUFFER_DIST_COUNT = 10;
+static const size_t FIRSTBUFFER_DIST_COUNT = 11;
 static const size_t MAP_CC2COUNT_COUNT = 2;
 static const size_t SPEED_DIST_COUNT = 6;
 
@@ -29,9 +29,9 @@ typedef std::map<unsigned long long, unsigned> map_cc2count;
 struct stat_data_bundle {
     string time;//lable
     string machine;
-    unsigned long long first_buffer_noraml_count; // 非试播
+    unsigned long long first_buffer_normal_count; // 非试播
     unsigned long long first_buffer_trial_count; // 试播
-    size_t noraml_count; // 非试播
+    size_t normal_count; // 非试播
     size_t trial_count; // 试播
 
     size_t firstbuffer_dist[FIRSTBUFFER_DIST_COUNT];// 分布0(0-1000), 1(1000-2000), 2(2000-3000), 3(3000-4000), 4(4000-5000), 5(5000-6000) ....
@@ -58,9 +58,9 @@ void stat_first_buffer(istream& ins) {
 	std::string buffer;
 	buffer.reserve(DEFAULT_BUFFER_SIZE);
 	unsigned long long first_buffer_trial_count = 0; // 试播
-	unsigned long long first_buffer_noraml_count = 0; // 非试播
+	unsigned long long first_buffer_normal_count = 0; // 非试播
 	size_t trial_count = 0; // 试播
-	size_t noraml_count = 0; // 非试播
+	size_t normal_count = 0; // 非试播
 	const std::string FIRST_BUFFER_FLAG = "f=firstbuffer";
 	const std::string FIRST_BUFFER_TIME_FLAG = "time=";
 	const std::string FIRST_BUFFER_PLAYTYPE_FLAG = "playtype=";
@@ -89,21 +89,21 @@ void stat_first_buffer(istream& ins) {
 				first_buffer_trial_count += time;
 				++trial_count;
 			} else {
-				first_buffer_noraml_count += time;
-				++noraml_count;
+				first_buffer_normal_count += time;
+				++normal_count;
 			}
 		}
 	}
 	printf("cost time=%i\n", GetTickCount() - start_tick_count);
 	// %I64u、%I64o、%I64x %I64d /// lld，ll，llu，llx，这几个都是输出64位的，
-	printf("first_buffer_trial_count=%llu, first_buffer_noraml_count=%llu\n", first_buffer_trial_count, first_buffer_noraml_count);
-	printf("trial_count=%u, noraml_count=%u\n", trial_count, noraml_count);
-	printf("first_buffer_trial=%llu, first_buffer_noraml=%llu\n", first_buffer_trial_count/trial_count,
-		first_buffer_noraml_count/noraml_count);
+	printf("first_buffer_trial_count=%llu, first_buffer_normal_count=%llu\n", first_buffer_trial_count, first_buffer_normal_count);
+	printf("trial_count=%u, normal_count=%u\n", trial_count, normal_count);
+	printf("first_buffer_trial=%llu, first_buffer_normal=%llu\n", first_buffer_trial_count/trial_count,
+		first_buffer_normal_count/normal_count);
 
-    s_fout_buffer << " first_buffer_trial=" << first_buffer_trial_count/trial_count << " first_buffer_noraml="
-        << first_buffer_noraml_count/noraml_count;
-	//cout << first_buffer_trial_count/trial_count << ", " << first_buffer_noraml_count/noraml_count << "\n";
+    s_fout_buffer << " first_buffer_trial=" << first_buffer_trial_count/trial_count << " first_buffer_normal="
+        << first_buffer_normal_count/normal_count;
+	//cout << first_buffer_trial_count/trial_count << ", " << first_buffer_normal_count/normal_count << "\n";
 }
 
 
@@ -393,8 +393,8 @@ void stat_all_func(vector<stat_data_bundle>& stats) {
                     dist_i = min(dist_i, (int)FIRSTBUFFER_DIST_COUNT-1);
                     ++(stat_ptr->t_firstbuffer_dist[dist_i]);
                 } else {
-                    stat_ptr->first_buffer_noraml_count += time;
-                    ++stat_ptr->noraml_count;
+                    stat_ptr->first_buffer_normal_count += time;
+                    ++stat_ptr->normal_count;
                     int dist_i = time/1000;
                     dist_i = max(dist_i, 0);
                     dist_i = min(dist_i, (int)FIRSTBUFFER_DIST_COUNT-1);
@@ -502,11 +502,11 @@ void stat_all_func(vector<stat_data_bundle>& stats) {
         // %I64u、%I64o、%I64x %I64d /// lld，ll，llu，llx，这几个都是输出64位的，
         const string fout_prefix = "[time]" + stats[i].time + "[machine]" + stats[i].machine;
         printf("==== %s ====\n", fout_prefix.c_str());
-        long first_buffer0 = stats[i].first_buffer_noraml_count/stats[i].noraml_count;
+        long first_buffer0 = stats[i].first_buffer_normal_count/stats[i].normal_count;
         long first_buffer1 = stats[i].first_buffer_trial_count/stats[i].trial_count;
-        printf("first_buffer_noraml_count=%llu, first_buffer_trial_count=%llu, noraml_count=%u, trial_count=%u, first_buffer_noraml=%u, first_buffer_trial=%u\n",
-               stats[i].first_buffer_noraml_count, stats[i].first_buffer_trial_count,
-               stats[i].noraml_count, stats[i].trial_count,
+        printf("first_buffer_normal_count=%llu, first_buffer_trial_count=%llu, normal_count=%u, trial_count=%u, first_buffer_normal=%u, first_buffer_trial=%u\n",
+               stats[i].first_buffer_normal_count, stats[i].first_buffer_trial_count,
+               stats[i].normal_count, stats[i].trial_count,
                first_buffer0, first_buffer1);
         printf("firstbuffer_dist distribution:");
         for (size_t j = 0; j < FIRSTBUFFER_DIST_COUNT; ++j) {
@@ -519,7 +519,7 @@ void stat_all_func(vector<stat_data_bundle>& stats) {
         }
         printf("\n");
 
-        s_fout_buffer << fout_prefix << " first_buffer_noraml=" << first_buffer0 << " first_buffer_trial=" << first_buffer1;
+        s_fout_buffer << fout_prefix << " first_buffer_normal=" << first_buffer0 << " first_buffer_trial=" << first_buffer1;
 
         for (size_t j = 0; j < MAP_CC2COUNT_COUNT; ++j) {
             //printf("[WARN] map_cc2count_e2[%u][0]=%u, map_cc2count_e3[%u][0]=%u\n", j, stats[i].map_cc2count_e2[j][0], j, stats[i].map_cc2count_e3[j][0]);
@@ -565,13 +565,15 @@ int stat_all_func(int argc, char* argv[]) {
         stat_datas[i].time = argv[1];
         stat_datas[i].machine = argv[i + 2];
         stat_datas[i].first_buffer_trial_count = 0;
-        stat_datas[i].first_buffer_noraml_count = 0;
+        stat_datas[i].first_buffer_normal_count = 0;
         stat_datas[i].trial_count = 0;
-        stat_datas[i].noraml_count = 0;
+        stat_datas[i].normal_count = 0;
         stat_datas[i].playspeed_value_count = 0;
         stat_datas[i].playspeed_count = 0;
         stat_datas[i].t_playspeed_value_count = 0;
         stat_datas[i].t_playspeed_count = 0;
+        memset(&stat_datas[i].firstbuffer_dist, 0, sizeof(stat_datas[i].firstbuffer_dist));
+        memset(&stat_datas[i].t_firstbuffer_dist, 0, sizeof(stat_datas[i].t_firstbuffer_dist));
         memset(&stat_datas[i].speed_dist, 0, sizeof(stat_datas[i].speed_dist));
         memset(&stat_datas[i].t_speed_dist, 0, sizeof(stat_datas[i].t_speed_dist));
     }
@@ -592,13 +594,85 @@ int stat_all_func(int argc, char* argv[]) {
 
 	return 0;
 }
+int tool_trait_stat_values(int argc, char* argv[]) {
+    const size_t TRAIT_STAT_FIELD_COUNT = 6;
+    vector<string> firstbuffer_values;
+    vector<string> t_firstbuffer_values;
+    vector<string> interrupt_values;
+    vector<string> t_interrupt_values;
+    vector<string> playspeed_values;
+    vector<string> t_playspeed_values;
+	const std::string FIRST_BUFFER_FLAG = "first_buffer_normal=";
+	const std::string T_FIRST_BUFFER_FLAG = "first_buffer_trial=";
+	const std::string INTERRUPT_RATE_FLAG = "interrupt_rate0=";
+	const std::string T_INTERRUPT_RATE_FLAG = "interrupt_rate1=";
+	const std::string PLAYSPEED_FLAG = "playspeed=";
+	const std::string T_PLAYSPEED_FLAG = "trialPlayspeed=";
+	const std::string SPLIT_FLAG = " ";
+	vector<string>* stat_values_array[TRAIT_STAT_FIELD_COUNT] = {&firstbuffer_values, &t_firstbuffer_values, &interrupt_values, &t_interrupt_values, &playspeed_values, &t_playspeed_values};
+	const std::string* stat_values_flag_array[TRAIT_STAT_FIELD_COUNT] = {&FIRST_BUFFER_FLAG, &T_FIRST_BUFFER_FLAG, &INTERRUPT_RATE_FLAG, &T_INTERRUPT_RATE_FLAG, &PLAYSPEED_FLAG, &T_PLAYSPEED_FLAG};
+    if (argc < 2) {
+		cerr << "Parameters error.\n" << endl;
+		cerr << "Usage: trait_stat_values.exe [in_file] [out_file](defaule './trait_stat_values_result.txt'). \n" << endl;
+		return -1;
+    }
+    const char* in_file = argv[1];
+    const char* out_file = NULL;
+    if (argc == 2)
+        out_file = "trait_stat_values_result.txt";
+    else
+        out_file = argv[2];
+
+	ifstream fin(in_file);
+    if (!fin) {
+        cerr << "load the data file[" << in_file << "] error.\n" << endl;
+        return -1;
+    }
+
+    const size_t DEFAULT_BUFFER_SIZE = 1 * 1024;
+	std::string buffer;
+	buffer.reserve(DEFAULT_BUFFER_SIZE);
+	while (getline(fin, buffer)) {
+		//cout << "line buffer:" << buffer << "\n";
+		if (buffer.empty())
+            continue;
+
+		size_t find_pos = 0;
+        for (size_t i = 0; i < TRAIT_STAT_FIELD_COUNT; ++i) {
+            find_pos = buffer.find(*(stat_values_flag_array[i]), find_pos);
+            if (find_pos == string::npos) {
+                break;
+            }
+            find_pos += stat_values_flag_array[i]->size();
+            size_t split_pos = buffer.find(SPLIT_FLAG, find_pos);
+            stat_values_array[i]->push_back(buffer.substr(find_pos, split_pos-find_pos));
+            find_pos = split_pos + SPLIT_FLAG.size();
+            //cout << "flag:" << *(stat_values_flag_array[i]) << stat_values_array[i]->back() << "\n";
+        }
+	}
+    std::ofstream fout(out_file, ios::app);
+    assert (fout);
+    for (size_t i = 0; i < TRAIT_STAT_FIELD_COUNT; ++i) {
+        fout << *stat_values_flag_array[i];
+        const vector<string>& stat_values_vec = *stat_values_array[i];
+        for (size_t j = 0; j < stat_values_vec.size(); ++j) {
+            fout << stat_values_vec[j] << "\t";
+        }
+        fout << "\n";
+    }
+    fout << std::endl;
+    fout.close();
+    fin.close();
+    cout << "Output:[file]" << out_file << ".\n";
+}
 
 int main(int argc, char* argv[])
 {
     assert (s_fout && s_fout_buffer);
     cout << "Running " << argv[0] << ".\n";
     //stat_single_func(argc, argv);
-    stat_all_func(argc, argv);
+    //stat_all_func(argc, argv);
+    tool_trait_stat_values(argc, argv);
 	//s_fout_buffer << endl;
     s_fout << s_fout_buffer.str() << endl;
 	//cout << "\n input any char to end.\n" << endl;
