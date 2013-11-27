@@ -336,6 +336,7 @@ int index_of_machine(int func_num, const vector<stat_data_bundle>& stats, const 
                 return i;
         }
 	}
+	//assert(false);
     return -1;
 }
 
@@ -347,7 +348,7 @@ void stat_all_func(vector<stat_data_bundle>& stats) {
     const std::string FIRST_BUFFER_FLAG = "firstbuffer";
     const std::string FIRST_BUFFER_TIME_FLAG = "time=";
     const std::string FIRST_BUFFER_PLAYTYPE_FLAG = "playtype=";
-    const char SPLIT_FLAG = '&';
+    const std::string SPLIT_FLAG = "&";
     const std::string BUFFER_FLAG = "buffer";
     const std::string BUFFER_E_FLAG = "e=";
     const std::string BUFFER_CC_FLAG = "cc=";
@@ -357,19 +358,25 @@ void stat_all_func(vector<stat_data_bundle>& stats) {
 	const std::string TRIAL_PLAYSPEED_FLAG = "trialPlayspeed";
 	const std::string TRIAL_PLAYSPEED_VAULE_FLAG = "s=";
 	const std::string FUNC_FLAG = "f=";
+	const std::string VOD_DOWNLOAD_MODE_FLAG = "vdm=";
 
     int start_tick_count = GetTickCount();
     while (getline(std::cin, buffer)) {
         //cout << "line buffer:" << buffer << "\n";
-        size_t func_flah_pos = string::npos;
-        if ((func_flah_pos = buffer.find(FUNC_FLAG)) == string::npos) {
+        size_t func_flag_pos = string::npos;
+        if ((func_flag_pos = buffer.find(FUNC_FLAG)) == string::npos) {
             continue;
         }
-        func_flah_pos += FUNC_FLAG.size();
+        func_flag_pos += FUNC_FLAG.size();
+        size_t find_pos = buffer.find(SPLIT_FLAG, func_flag_pos);
+        //assert (find_pos != string::npos);
+        if (find_pos == string::npos) {
+            continue;
+        }
+        const string func_value = buffer.substr(func_flag_pos, find_pos - func_flag_pos);
+        find_pos += SPLIT_FLAG.size();
         stat_data_bundle* stat_ptr = NULL;
-        size_t find_pos = string::npos;
-        if ((find_pos = buffer.find(FIRST_BUFFER_FLAG, func_flah_pos)) != string::npos) {
-            find_pos += FIRST_BUFFER_FLAG.size();
+        if (func_value == FIRST_BUFFER_FLAG) {
             int index = index_of_machine(0, stats, buffer, find_pos);
             if (index == -1) {
                 continue;
@@ -401,8 +408,7 @@ void stat_all_func(vector<stat_data_bundle>& stats) {
                     ++(stat_ptr->firstbuffer_dist[dist_i]);
                 }
             }
-        } else if ((find_pos = buffer.find(BUFFER_FLAG, func_flah_pos)) != string::npos) {
-            find_pos += BUFFER_FLAG.size();
+        } else if (func_value == BUFFER_FLAG) {
             int index = index_of_machine(1, stats, buffer, find_pos);
             if (index == -1) {
                 continue;
@@ -451,8 +457,7 @@ void stat_all_func(vector<stat_data_bundle>& stats) {
                     continue;
                 }
             }
-        } else if ((find_pos = buffer.find(PLAYSPEED_FLAG, func_flah_pos)) != string::npos) {
-            find_pos += PLAYSPEED_FLAG.size();
+        } else if (func_value == PLAYSPEED_FLAG) {
             int index = index_of_machine(2, stats, buffer, find_pos);
             if (index == -1) {
                 continue;
@@ -473,8 +478,7 @@ void stat_all_func(vector<stat_data_bundle>& stats) {
                 }
 
             }
-        } else if ((find_pos = buffer.find(TRIAL_PLAYSPEED_FLAG, func_flah_pos)) != string::npos) {
-            find_pos += TRIAL_PLAYSPEED_FLAG.size();
+        } else if (func_value == TRIAL_PLAYSPEED_FLAG) {
             int index = index_of_machine(3, stats, buffer, find_pos);
             if (index == -1) {
                 continue;
@@ -671,8 +675,8 @@ int main(int argc, char* argv[])
     assert (s_fout && s_fout_buffer);
     cout << "Running " << argv[0] << ".\n";
     //stat_single_func(argc, argv);
-    //stat_all_func(argc, argv);
-    tool_trait_stat_values(argc, argv);
+    stat_all_func(argc, argv);
+    //tool_trait_stat_values(argc, argv);
 	//s_fout_buffer << endl;
     s_fout << s_fout_buffer.str() << endl;
 	//cout << "\n input any char to end.\n" << endl;
