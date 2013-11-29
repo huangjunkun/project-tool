@@ -29,23 +29,27 @@ typedef std::map<unsigned long long, unsigned> map_cc2count;
 struct stat_data_bundle {
     string time;//lable
     string machine;
-    unsigned long long first_buffer_normal_count; // 非试播
-    unsigned long long first_buffer_trial_count; // 试播
-    size_t normal_count; // 非试播
-    size_t trial_count; // 试播
+    unsigned long long firstbuffer_sum; // 非试播
+    unsigned long long t_firstbuffer_sum; // 试播
+    size_t firstbuffer_count; // 非试播
+    size_t t_firstbuffer_count; // 试播
 
     size_t firstbuffer_dist[FIRSTBUFFER_DIST_COUNT];// 分布0(0-1000), 1(1000-2000), 2(2000-3000), 3(3000-4000), 4(4000-5000), 5(5000-6000) ....
     size_t t_firstbuffer_dist[FIRSTBUFFER_DIST_COUNT];//
 
     map_cc2count map_cc2count_e2[MAP_CC2COUNT_COUNT]; //[0] 点播统计, [1]试播统计
     map_cc2count map_cc2count_e3[MAP_CC2COUNT_COUNT];
-    double playspeed_value_count;
+    double playspeed_sum;
     size_t playspeed_count; //
     size_t speed_dist[SPEED_DIST_COUNT];// 速度分布0(0-100), 1(100-200), 2(200-300), 3(300-400), 4(400-500), 5(500-)
-    double t_playspeed_value_count;
+    double t_playspeed_sum;
     size_t t_playspeed_count; //
     size_t t_speed_dist[SPEED_DIST_COUNT];//
 };
+
+static const size_t VDM_COUNT = 2;
+//typedef stat_data_bundle v_stat_data_bundle[VDM_COUNT];
+typedef vector<stat_data_bundle> v_stat_data_bundle;
 
 long GetTickCount() {
     time_t timer;
@@ -57,53 +61,53 @@ void stat_first_buffer(istream& ins) {
 	const size_t DEFAULT_BUFFER_SIZE = 4 * 1024;
 	std::string buffer;
 	buffer.reserve(DEFAULT_BUFFER_SIZE);
-	unsigned long long first_buffer_trial_count = 0; // 试播
-	unsigned long long first_buffer_normal_count = 0; // 非试播
-	size_t trial_count = 0; // 试播
-	size_t normal_count = 0; // 非试播
-	const std::string FIRST_BUFFER_FLAG = "f=firstbuffer";
-	const std::string FIRST_BUFFER_TIME_FLAG = "time=";
-	const std::string FIRST_BUFFER_PLAYTYPE_FLAG = "playtype=";
+	unsigned long long t_firstbuffer_sum = 0; // 试播
+	unsigned long long firstbuffer_sum = 0; // 非试播
+	size_t t_firstbuffer_count = 0; // 试播
+	size_t firstbuffer_count = 0; // 非试播
+	const std::string FUNC_FLAG_FIRST_BUFFER = "f=firstbuffer";
+	const std::string ARG_FLAG_FIRST_BUFFER_TIME = "time=";
+	const std::string ARG_FLAG_FIRST_BUFFER_PLAYTYPE = "playtype=";
 	const char SPLIT_FLAG = '&';
 	int start_tick_count = ::GetTickCount();
 	while (getline(ins, buffer)) {
 		//cout << "line buffer:" << buffer << "\n";
-		size_t find_pos = buffer.find(FIRST_BUFFER_FLAG);
+		size_t find_pos = buffer.find(FUNC_FLAG_FIRST_BUFFER);
 		assert (find_pos != string::npos);
-		find_pos += FIRST_BUFFER_FLAG.size();
-		find_pos = buffer.find(FIRST_BUFFER_TIME_FLAG, find_pos);
+		find_pos += FUNC_FLAG_FIRST_BUFFER.size();
+		find_pos = buffer.find(ARG_FLAG_FIRST_BUFFER_TIME, find_pos);
 		if (find_pos != string::npos) {
-			find_pos += FIRST_BUFFER_TIME_FLAG.size();
+			find_pos += ARG_FLAG_FIRST_BUFFER_TIME.size();
 			size_t next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
 			//char time_buffer[16];
 			int time = atoi(buffer.substr(find_pos, next_split_pos - find_pos).c_str());
 			//cout << "line time:" << time << "\n";
 			find_pos = next_split_pos;
-			find_pos = buffer.find(FIRST_BUFFER_PLAYTYPE_FLAG, find_pos);
-			find_pos += FIRST_BUFFER_PLAYTYPE_FLAG.size();
+			find_pos = buffer.find(ARG_FLAG_FIRST_BUFFER_PLAYTYPE, find_pos);
+			find_pos += ARG_FLAG_FIRST_BUFFER_PLAYTYPE.size();
 			next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
 			const std::string playtype = buffer.substr(find_pos, next_split_pos - find_pos);
 			//cout << "line playtype:" << playtype << "\n";
 			//getch();
 			if (playtype == "1") {
-				first_buffer_trial_count += time;
-				++trial_count;
+				t_firstbuffer_sum += time;
+				++t_firstbuffer_count;
 			} else {
-				first_buffer_normal_count += time;
-				++normal_count;
+				firstbuffer_sum += time;
+				++firstbuffer_count;
 			}
 		}
 	}
 	printf("cost time=%i\n", GetTickCount() - start_tick_count);
 	// %I64u、%I64o、%I64x %I64d /// lld，ll，llu，llx，这几个都是输出64位的，
-	printf("first_buffer_trial_count=%llu, first_buffer_normal_count=%llu\n", first_buffer_trial_count, first_buffer_normal_count);
-	printf("trial_count=%u, normal_count=%u\n", trial_count, normal_count);
-	printf("first_buffer_trial=%llu, first_buffer_normal=%llu\n", first_buffer_trial_count/trial_count,
-		first_buffer_normal_count/normal_count);
+	printf("t_firstbuffer_sum=%llu, firstbuffer_sum=%llu\n", t_firstbuffer_sum, firstbuffer_sum);
+	printf("t_firstbuffer_count=%u, firstbuffer_count=%u\n", t_firstbuffer_count, firstbuffer_count);
+	printf("t_firstbuffer=%llu, firstbuffer=%llu\n", t_firstbuffer_sum/t_firstbuffer_count,
+		firstbuffer_sum/firstbuffer_count);
 
-    s_fout_buffer << " first_buffer_trial=" << first_buffer_trial_count/trial_count << " first_buffer_normal="
-        << first_buffer_normal_count/normal_count;
-	//cout << first_buffer_trial_count/trial_count << ", " << first_buffer_normal_count/normal_count << "\n";
+    s_fout_buffer << " t_firstbuffer=" << t_firstbuffer_sum/t_firstbuffer_count << " firstbuffer="
+        << firstbuffer_sum/firstbuffer_count;
+	//cout << t_firstbuffer_sum/t_firstbuffer_count << ", " << firstbuffer_sum/firstbuffer_count << "\n";
 }
 
 
@@ -111,38 +115,38 @@ void stat_interrupt_rate(istream& ins) {
 	const size_t DEFAULT_BUFFER_SIZE = 4 * 1024;
 	std::string buffer;
 	buffer.reserve(DEFAULT_BUFFER_SIZE);
-	const std::string BUFFER_FLAG = "f=buffer";
-	const std::string BUFFER_E_FLAG = "e=";
-	const std::string BUFFER_CC_FLAG = "cc=";
-	const std::string BUFFER_PLAYTYPE_FLAG = "playtype=";
+	const std::string FUNC_FLAG_BUFFER = "f=buffer";
+	const std::string ARG_FLAG_BUFFER_E = "e=";
+	const std::string ARG_FLAG_BUFFER_CC = "cc=";
+	const std::string ARG_FLAG_BUFFER_PLAYTYPE = "playtype=";
 	const char SPLIT_FLAG = '&';
-	map_cc2count map_cc2count_e2[2]; //[0] 点播统计, [1]试播统计
-	map_cc2count map_cc2count_e3[2];
+	map_cc2count map_cc2count_e2[MAP_CC2COUNT_COUNT]; //[0] 点播统计, [1]试播统计
+	map_cc2count map_cc2count_e3[MAP_CC2COUNT_COUNT];
 
 	int start_tick_count = ::GetTickCount();
 	while (getline(ins, buffer)) {
-		size_t find_pos = buffer.find(BUFFER_FLAG);
+		size_t find_pos = buffer.find(FUNC_FLAG_BUFFER);
 		assert (find_pos != string::npos);
-		find_pos += BUFFER_FLAG.size();
-		size_t playtype_pos = buffer.find(BUFFER_PLAYTYPE_FLAG, find_pos);
+		find_pos += FUNC_FLAG_BUFFER.size();
+		size_t playtype_pos = buffer.find(ARG_FLAG_BUFFER_PLAYTYPE, find_pos);
 		int playtype = 0;// 默认为点播（播放方式）
 		if (playtype_pos != string::npos) {
-            playtype_pos = playtype_pos + BUFFER_PLAYTYPE_FLAG.size();
+            playtype_pos = playtype_pos + ARG_FLAG_BUFFER_PLAYTYPE.size();
 			size_t next_split_pos = buffer.find(SPLIT_FLAG, playtype_pos);
             playtype = atoi(buffer.substr(playtype_pos, next_split_pos - playtype_pos).c_str());
             assert (playtype < 2);
             find_pos = playtype_pos;
 		} else continue;
 
-		find_pos = buffer.find(BUFFER_E_FLAG, find_pos);
+		find_pos = buffer.find(ARG_FLAG_BUFFER_E, find_pos);
 		if (find_pos != string::npos) {
-			find_pos += BUFFER_E_FLAG.size();
+			find_pos += ARG_FLAG_BUFFER_E.size();
 			size_t next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
 			int e_value = atoi(buffer.substr(find_pos, next_split_pos - find_pos).c_str());
 			find_pos = next_split_pos;
 			long long cc_value = 0;
-			find_pos = buffer.find(BUFFER_CC_FLAG, find_pos);
-			find_pos += BUFFER_CC_FLAG.size();
+			find_pos = buffer.find(ARG_FLAG_BUFFER_CC, find_pos);
+			find_pos += ARG_FLAG_BUFFER_CC.size();
 			next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
 			cc_value = atoll(buffer.substr(find_pos, next_split_pos - find_pos).c_str());
 			if (cc_value != 0) {
@@ -187,64 +191,64 @@ void stat_playspeed(istream& ins) {
 	const size_t DEFAULT_BUFFER_SIZE = 4 * 1024;
 	std::string buffer;
 	buffer.reserve(DEFAULT_BUFFER_SIZE);
-	double playspeed_value_count = 0;
+	double playspeed_sum = 0;
 	size_t playspeed_count = 0; //
-	const std::string PLAYSPEED_FLAG = "f=playspeed";
-	const std::string PLAYSPEED_VAULE_FLAG = "s=";
+	const std::string FUNC_FLAG_PLAYSPEED = "f=playspeed";
+	const std::string ARG_FLAG_PLAYSPEED_VAULE = "s=";
 	const char SPLIT_FLAG = '&';
 	int start_tick_count = ::GetTickCount();
 	while (getline(ins, buffer)) {
 		//cout << "line buffer:" << buffer << "\n";
-		size_t find_pos = buffer.find(PLAYSPEED_FLAG);
+		size_t find_pos = buffer.find(FUNC_FLAG_PLAYSPEED);
 		assert (find_pos != string::npos);
-		find_pos += PLAYSPEED_FLAG.size();
-		find_pos = buffer.find(PLAYSPEED_VAULE_FLAG, find_pos);
+		find_pos += FUNC_FLAG_PLAYSPEED.size();
+		find_pos = buffer.find(ARG_FLAG_PLAYSPEED_VAULE, find_pos);
 		if (find_pos != string::npos) {
-			find_pos += PLAYSPEED_VAULE_FLAG.size();
+			find_pos += ARG_FLAG_PLAYSPEED_VAULE.size();
 			size_t next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
 			double speed = atof(buffer.substr(find_pos, next_split_pos - find_pos).c_str());
 			//cout << "line speed:" << speed << "\n";
 			//getch();
-			playspeed_value_count += speed;
+			playspeed_sum += speed;
 			++playspeed_count;
 		}
 	}
 	printf("cost time=%i\n", GetTickCount() - start_tick_count);
-	printf("playspeed_count=%u, playspeed_value_count=%f\n", playspeed_count, playspeed_value_count);
-	printf("playspeed=%f\n", playspeed_value_count / playspeed_count);
-	s_fout_buffer << " playspeed=" << playspeed_value_count / playspeed_count;
+	printf("playspeed_count=%u, playspeed_sum=%f\n", playspeed_count, playspeed_sum);
+	printf("playspeed=%f\n", playspeed_sum / playspeed_count);
+	s_fout_buffer << " playspeed=" << playspeed_sum / playspeed_count;
 }
 
 void stat_trial_playspeed(istream& ins) {
 	const size_t DEFAULT_BUFFER_SIZE = 4 * 1024;
 	std::string buffer;
 	buffer.reserve(DEFAULT_BUFFER_SIZE);
-	double t_playspeed_value_count = 0;
+	double t_playspeed_sum = 0;
 	size_t t_playspeed_count = 0; //
-	const std::string TRIAL_PLAYSPEED_FLAG = "f=trialPlayspeed";
-	const std::string TRIAL_PLAYSPEED_VAULE_FLAG = "s=";
+	const std::string FUNC_FLAG_TRIAL_PLAYSPEED = "f=trialPlayspeed";
+	const std::string ARG_FLAG_TRIAL_PLAYSPEED_VAULE = "s=";
 	const char SPLIT_FLAG = '&';
 	int start_tick_count = ::GetTickCount();
 	while (getline(ins, buffer)) {
 		//cout << "line buffer:" << buffer << "\n";
-		size_t find_pos = buffer.find(TRIAL_PLAYSPEED_FLAG);
+		size_t find_pos = buffer.find(FUNC_FLAG_TRIAL_PLAYSPEED);
 		assert (find_pos != string::npos);
-		find_pos += TRIAL_PLAYSPEED_FLAG.size();
-		find_pos = buffer.find(TRIAL_PLAYSPEED_VAULE_FLAG, find_pos);
+		find_pos += FUNC_FLAG_TRIAL_PLAYSPEED.size();
+		find_pos = buffer.find(ARG_FLAG_TRIAL_PLAYSPEED_VAULE, find_pos);
 		if (find_pos != string::npos) {
-			find_pos += TRIAL_PLAYSPEED_VAULE_FLAG.size();
+			find_pos += ARG_FLAG_TRIAL_PLAYSPEED_VAULE.size();
 			size_t next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
 			double speed = atof(buffer.substr(find_pos, next_split_pos - find_pos).c_str());
 			//cout << "line speed:" << speed << "\n";
 			//getch();
-			t_playspeed_value_count += speed;
+			t_playspeed_sum += speed;
 			++t_playspeed_count;
 		}
 	}
 	printf("cost time=%i\n", GetTickCount() - start_tick_count);
-	printf("trialPlayspeed_count=%u, trialPlayspeed_value_count=%f\n", t_playspeed_count, t_playspeed_value_count);
-	printf("trialPlayspeed=%f\n", t_playspeed_value_count / t_playspeed_count);
-	s_fout_buffer << " trialPlayspeed=" << t_playspeed_value_count / t_playspeed_count;
+	printf("trialPlayspeed_count=%u, trialPlayspeed_value_count=%f\n", t_playspeed_count, t_playspeed_sum);
+	printf("trialPlayspeed=%f\n", t_playspeed_sum / t_playspeed_count);
+	s_fout_buffer << " trialPlayspeed=" << t_playspeed_sum / t_playspeed_count;
 }
 int stat_single_func(int argc, char* argv[]) {
     //s_fout_buffer.clear();
@@ -308,30 +312,30 @@ int stat_single_func(int argc, char* argv[]) {
 }
 
 
-int index_of_machine(int func_num, const vector<stat_data_bundle>& stats, const string& buffer, size_t find_offset = 0) {
+int index_of_machine(int func_num, const vector<v_stat_data_bundle>& stats, const string& buffer, size_t find_offset = 0) {
 	if (func_num == 0) {
         for (size_t i = 0; i < stats.size(); ++i) {
-            const string flag = "vod=" + stats[i].machine;
+            const string flag = "vod=" + stats[i][0].machine;
             if (buffer.find(flag, find_offset) != string::npos)
                 return i;
         }
 	} else if (func_num == 1) {
         for (size_t i = 0; i < stats.size(); ++i) {
-            const string flag = stats[i].machine;
+            const string flag = stats[i][0].machine;
             if (buffer.find(flag, find_offset) != string::npos)
                 return i;
         }
 
 	} else if (func_num == 2) {
         for (size_t i = 0; i < stats.size(); ++i) {
-            const string flag = stats[i].machine;
+            const string flag = stats[i][0].machine;
             if (buffer.find(flag, find_offset) != string::npos)
                 return i;
         }
 
 	} else if (func_num == 3) {
         for (size_t i = 0; i < stats.size(); ++i) {
-            const string flag = stats[i].machine;
+            const string flag = stats[i][0].machine;
             if (buffer.find(flag, find_offset) != string::npos)
                 return i;
         }
@@ -340,25 +344,25 @@ int index_of_machine(int func_num, const vector<stat_data_bundle>& stats, const 
     return -1;
 }
 
-void stat_all_func(vector<stat_data_bundle>& stats) {
+void stat_all_func(vector<v_stat_data_bundle>& stats) {
     const size_t DEFAULT_BUFFER_SIZE = 4 * 1024;
     std::string buffer;
     buffer.reserve(DEFAULT_BUFFER_SIZE);
 
-    const std::string FIRST_BUFFER_FLAG = "firstbuffer";
-    const std::string FIRST_BUFFER_TIME_FLAG = "time=";
-    const std::string FIRST_BUFFER_PLAYTYPE_FLAG = "playtype=";
+    const std::string FUNC_FLAG_FIRST_BUFFER = "firstbuffer";
+    const std::string ARG_FLAG_FIRST_BUFFER_TIME = "&time=";
+    const std::string ARG_FLAG_FIRST_BUFFER_PLAYTYPE = "&playtype=";
     const std::string SPLIT_FLAG = "&";
-    const std::string BUFFER_FLAG = "buffer";
-    const std::string BUFFER_E_FLAG = "e=";
-    const std::string BUFFER_CC_FLAG = "cc=";
-    const std::string BUFFER_PLAYTYPE_FLAG = "playtype=";
-    const std::string PLAYSPEED_FLAG = "playspeed";
-    const std::string PLAYSPEED_VAULE_FLAG = "s=";
-	const std::string TRIAL_PLAYSPEED_FLAG = "trialPlayspeed";
-	const std::string TRIAL_PLAYSPEED_VAULE_FLAG = "s=";
-	const std::string FUNC_FLAG = "f=";
-	const std::string VOD_DOWNLOAD_MODE_FLAG = "vdm=";
+    const std::string FUNC_FLAG_BUFFER = "buffer";
+    const std::string ARG_FLAG_BUFFER_E = "&e=";
+    const std::string ARG_FLAG_BUFFER_CC = "&cc=";
+    const std::string ARG_FLAG_BUFFER_PLAYTYPE = "&playtype=";
+    const std::string FUNC_FLAG_PLAYSPEED = "playspeed";
+    const std::string ARG_FLAG_PLAYSPEED_VAULE = "&s=";
+	const std::string FUNC_FLAG_TRIAL_PLAYSPEED = "trialPlayspeed";
+	const std::string ARG_FLAG_TRIAL_PLAYSPEED_VAULE = "&s=";
+	const std::string FUNC_FLAG = "&f=";
+	const std::string VOD_DOWNLOAD_MODE_FLAG = "&vdm=";
 
     int start_tick_count = GetTickCount();
     while (getline(std::cin, buffer)) {
@@ -374,65 +378,90 @@ void stat_all_func(vector<stat_data_bundle>& stats) {
             continue;
         }
         const string func_value = buffer.substr(func_flag_pos, find_pos - func_flag_pos);
-        find_pos += SPLIT_FLAG.size();
         stat_data_bundle* stat_ptr = NULL;
-        if (func_value == FIRST_BUFFER_FLAG) {
+        int vdm_value = -1;
+        size_t next_split_pos;
+        if (func_value == FUNC_FLAG_FIRST_BUFFER) {
             int index = index_of_machine(0, stats, buffer, find_pos);
             if (index == -1) {
                 continue;
             }
-            stat_ptr = &stats[index];
-            find_pos = buffer.find(FIRST_BUFFER_TIME_FLAG, find_pos);
+            find_pos = buffer.find(VOD_DOWNLOAD_MODE_FLAG, find_pos);
+            if (find_pos == string::npos) {
+                continue;
+            }
+            find_pos += VOD_DOWNLOAD_MODE_FLAG.size();
+            next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
+            vdm_value = atoi(buffer.substr(find_pos, next_split_pos - find_pos).c_str());
+            assert (vdm_value < VDM_COUNT);
+            stat_ptr = &stats[index][vdm_value];
+            find_pos = next_split_pos;
+            find_pos = buffer.find(ARG_FLAG_FIRST_BUFFER_TIME, find_pos);
             if (find_pos != string::npos) {
-                find_pos += FIRST_BUFFER_TIME_FLAG.size();
-                size_t next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
+                find_pos += ARG_FLAG_FIRST_BUFFER_TIME.size();
+                next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
                 int time = atoi(buffer.substr(find_pos, next_split_pos - find_pos).c_str());
+                // TEST ...
+//                if (time > 60 * 1000) {
+//                    printf("[WARNING] time=%i, buffer=%s\n", time, buffer.c_str());
+//                    continue;
+//                }
+
                 find_pos = next_split_pos;
-                find_pos = buffer.find(FIRST_BUFFER_PLAYTYPE_FLAG, find_pos);
-                find_pos += FIRST_BUFFER_PLAYTYPE_FLAG.size();
+                find_pos = buffer.find(ARG_FLAG_FIRST_BUFFER_PLAYTYPE, find_pos);
+                find_pos += ARG_FLAG_FIRST_BUFFER_PLAYTYPE.size();
                 next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
                 const std::string playtype = buffer.substr(find_pos, next_split_pos - find_pos);
                 if (playtype == "1") {
-                    stat_ptr->first_buffer_trial_count += time;
-                    ++stat_ptr->trial_count;
+                    stat_ptr->t_firstbuffer_sum += time;
+                    ++stat_ptr->t_firstbuffer_count;
                     int dist_i = time/1000;
                     dist_i = max(dist_i, 0);
                     dist_i = min(dist_i, (int)FIRSTBUFFER_DIST_COUNT-1);
                     ++(stat_ptr->t_firstbuffer_dist[dist_i]);
                 } else {
-                    stat_ptr->first_buffer_normal_count += time;
-                    ++stat_ptr->normal_count;
+                    stat_ptr->firstbuffer_sum += time;
+                    ++stat_ptr->firstbuffer_count;
                     int dist_i = time/1000;
                     dist_i = max(dist_i, 0);
                     dist_i = min(dist_i, (int)FIRSTBUFFER_DIST_COUNT-1);
                     ++(stat_ptr->firstbuffer_dist[dist_i]);
                 }
             }
-        } else if (func_value == BUFFER_FLAG) {
+        } else if (func_value == FUNC_FLAG_BUFFER) {
             int index = index_of_machine(1, stats, buffer, find_pos);
             if (index == -1) {
                 continue;
             }
-            stat_ptr = &stats[index];
-            size_t playtype_pos = buffer.find(BUFFER_PLAYTYPE_FLAG, find_pos);
+            find_pos = buffer.find(VOD_DOWNLOAD_MODE_FLAG, find_pos);
+            if (find_pos == string::npos) {
+                continue;
+            }
+            find_pos += VOD_DOWNLOAD_MODE_FLAG.size();
+            next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
+            vdm_value = atoi(buffer.substr(find_pos, next_split_pos - find_pos).c_str());
+            assert (vdm_value < VDM_COUNT);
+            find_pos = next_split_pos;
+            stat_ptr = &stats[index][vdm_value];
+            size_t playtype_pos = buffer.find(ARG_FLAG_BUFFER_PLAYTYPE, find_pos);
             int playtype = 0;// 默认为点播（播放方式）
             if (playtype_pos != string::npos) {
-                playtype_pos = playtype_pos + BUFFER_PLAYTYPE_FLAG.size();
-                size_t next_split_pos = buffer.find(SPLIT_FLAG, playtype_pos);
+                playtype_pos = playtype_pos + ARG_FLAG_BUFFER_PLAYTYPE.size();
+                next_split_pos = buffer.find(SPLIT_FLAG, playtype_pos);
                 playtype = atoi(buffer.substr(playtype_pos, next_split_pos - playtype_pos).c_str());
                 assert (playtype < 2);
                 find_pos = playtype_pos;
             } else continue;
 
-            find_pos = buffer.find(BUFFER_E_FLAG, find_pos);
+            find_pos = buffer.find(ARG_FLAG_BUFFER_E, find_pos);
             if (find_pos != string::npos) {
-                find_pos += BUFFER_E_FLAG.size();
-                size_t next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
+                find_pos += ARG_FLAG_BUFFER_E.size();
+                next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
                 int e_value = atoi(buffer.substr(find_pos, next_split_pos - find_pos).c_str());
                 find_pos = next_split_pos;
                 long long cc_value = 0;
-                find_pos = buffer.find(BUFFER_CC_FLAG, find_pos);
-                find_pos += BUFFER_CC_FLAG.size();
+                find_pos = buffer.find(ARG_FLAG_BUFFER_CC, find_pos);
+                find_pos += ARG_FLAG_BUFFER_CC.size();
                 next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
                 cc_value = atoll(buffer.substr(find_pos, next_split_pos - find_pos).c_str());
                 if (cc_value != 0) {
@@ -457,19 +486,28 @@ void stat_all_func(vector<stat_data_bundle>& stats) {
                     continue;
                 }
             }
-        } else if (func_value == PLAYSPEED_FLAG) {
+        } else if (func_value == FUNC_FLAG_PLAYSPEED) {
             int index = index_of_machine(2, stats, buffer, find_pos);
             if (index == -1) {
                 continue;
             }
-            stat_ptr = &stats[index];
-            find_pos = buffer.find(PLAYSPEED_VAULE_FLAG, find_pos);
+            find_pos = buffer.find(VOD_DOWNLOAD_MODE_FLAG, find_pos);
+            if (find_pos == string::npos) {
+                continue;
+            }
+            find_pos += VOD_DOWNLOAD_MODE_FLAG.size();
+            next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
+            vdm_value = atoi(buffer.substr(find_pos, next_split_pos - find_pos).c_str());
+            assert (vdm_value < VDM_COUNT);
+            find_pos = next_split_pos;
+            stat_ptr = &stats[index][vdm_value];
+            find_pos = buffer.find(ARG_FLAG_PLAYSPEED_VAULE, find_pos);
             if (find_pos != string::npos) {
-                find_pos += PLAYSPEED_VAULE_FLAG.size();
-                size_t next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
+                find_pos += ARG_FLAG_PLAYSPEED_VAULE.size();
+                next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
                 double speed = atof(buffer.substr(find_pos, next_split_pos - find_pos).c_str());
                 if (speed > 0 && speed < 10 * 1024 * 1024) {
-                    stat_ptr->playspeed_value_count += speed;
+                    stat_ptr->playspeed_sum += speed;
                     ++(stat_ptr->playspeed_count);
                     int dist_i = ((int)speed)/100;
                     dist_i = max(dist_i, 0);
@@ -478,19 +516,28 @@ void stat_all_func(vector<stat_data_bundle>& stats) {
                 }
 
             }
-        } else if (func_value == TRIAL_PLAYSPEED_FLAG) {
+        } else if (func_value == FUNC_FLAG_TRIAL_PLAYSPEED) {
             int index = index_of_machine(3, stats, buffer, find_pos);
             if (index == -1) {
                 continue;
             }
-            stat_ptr = &stats[index];
-            find_pos = buffer.find(TRIAL_PLAYSPEED_VAULE_FLAG, find_pos);
+            find_pos = buffer.find(VOD_DOWNLOAD_MODE_FLAG, find_pos);
+            if (find_pos == string::npos) {
+                continue;
+            }
+            find_pos += VOD_DOWNLOAD_MODE_FLAG.size();
+            next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
+            vdm_value = atoi(buffer.substr(find_pos, next_split_pos - find_pos).c_str());
+            assert (vdm_value < VDM_COUNT);
+            find_pos = next_split_pos;
+            stat_ptr = &stats[index][vdm_value];
+            find_pos = buffer.find(ARG_FLAG_TRIAL_PLAYSPEED_VAULE, find_pos);
             if (find_pos != string::npos) {
-                find_pos += TRIAL_PLAYSPEED_VAULE_FLAG.size();
-                size_t next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
+                find_pos += ARG_FLAG_TRIAL_PLAYSPEED_VAULE.size();
+                next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
                 double speed = atof(buffer.substr(find_pos, next_split_pos - find_pos).c_str());
                 if (speed > 0 && speed < 10 * 1024 * 1024) {
-                    stat_ptr->t_playspeed_value_count += speed;
+                    stat_ptr->t_playspeed_sum += speed;
                     ++(stat_ptr->t_playspeed_count);
                     int dist_i = ((int)speed)/100;
                     dist_i = max(dist_i, 0);
@@ -503,56 +550,60 @@ void stat_all_func(vector<stat_data_bundle>& stats) {
 
     printf("cost time=%i\n", GetTickCount() - start_tick_count);
     for (size_t i = 0; i < stats.size(); ++i) {
-        // %I64u、%I64o、%I64x %I64d /// lld，ll，llu，llx，这几个都是输出64位的，
-        const string fout_prefix = "[time]" + stats[i].time + "[machine]" + stats[i].machine;
-        printf("==== %s ====\n", fout_prefix.c_str());
-        long first_buffer0 = stats[i].first_buffer_normal_count/stats[i].normal_count;
-        long first_buffer1 = stats[i].first_buffer_trial_count/stats[i].trial_count;
-        printf("first_buffer_normal_count=%llu, first_buffer_trial_count=%llu, normal_count=%u, trial_count=%u, first_buffer_normal=%u, first_buffer_trial=%u\n",
-               stats[i].first_buffer_normal_count, stats[i].first_buffer_trial_count,
-               stats[i].normal_count, stats[i].trial_count,
-               first_buffer0, first_buffer1);
-        printf("firstbuffer_dist distribution:");
-        for (size_t j = 0; j < FIRSTBUFFER_DIST_COUNT; ++j) {
-            printf(" [%u-%u)(%u)", j*1000, j*1000+1000, stats[i].firstbuffer_dist[j]);
-        }
-        printf("\n");
-        printf("t_firstbuffer_dist distribution:");
-        for (size_t j = 0; j < FIRSTBUFFER_DIST_COUNT; ++j) {
-            printf(" [%u-%u)(%u)", j*1000, j*1000+1000, stats[i].t_firstbuffer_dist[j]);
-        }
-        printf("\n");
+        for (size_t j = 0; j < stats[i].size(); ++j) {
+			stat_data_bundle& bundle = stats[i][j];
+			// %I64u、%I64o、%I64x %I64d /// lld，ll，llu，llx，这几个都是输出64位的，
+			const string fout_prefix = "[time]" + bundle.time + "[machine]" + bundle.machine + (j==0 ? "[P2S]":"[P2P]");
+			printf("==== %s ====\n", fout_prefix.c_str());
+			long firstbuffer = (bundle.firstbuffer_count==0 ? 0 : bundle.firstbuffer_sum/bundle.firstbuffer_count);
+			long t_firstbuffer = (bundle.t_firstbuffer_count==0 ? 0 : bundle.t_firstbuffer_sum/bundle.t_firstbuffer_count);
+			printf("firstbuffer_sum=%llu, t_firstbuffer_sum=%llu, firstbuffer_count=%u, t_firstbuffer_count=%u, firstbuffer=%u, t_firstbuffer=%u\n",
+				   bundle.firstbuffer_sum, bundle.t_firstbuffer_sum,
+				   bundle.firstbuffer_count, bundle.t_firstbuffer_count,
+				   firstbuffer, t_firstbuffer);
+			printf("firstbuffer_dist distribution:");
+			for (size_t j = 0; j < FIRSTBUFFER_DIST_COUNT; ++j) {
+				printf(" [%u-%u)(%u)", j*1000, j*1000+1000, bundle.firstbuffer_dist[j]);
+			}
+			printf("\n");
+			printf("t_firstbuffer_dist distribution:");
+			for (size_t j = 0; j < FIRSTBUFFER_DIST_COUNT; ++j) {
+				printf(" [%u-%u)(%u)", j*1000, j*1000+1000, bundle.t_firstbuffer_dist[j]);
+			}
+			printf("\n");
 
-        s_fout_buffer << fout_prefix << " first_buffer_normal=" << first_buffer0 << " first_buffer_trial=" << first_buffer1;
+			s_fout_buffer << fout_prefix << " firstbuffer_count=" << bundle.firstbuffer_count << " t_firstbuffer_count=" << bundle.t_firstbuffer_count
+			<< " firstbuffer=" << firstbuffer << " t_firstbuffer=" << t_firstbuffer;
 
-        for (size_t j = 0; j < MAP_CC2COUNT_COUNT; ++j) {
-            //printf("[WARN] map_cc2count_e2[%u][0]=%u, map_cc2count_e3[%u][0]=%u\n", j, stats[i].map_cc2count_e2[j][0], j, stats[i].map_cc2count_e3[j][0]);
-            printf("cc2count_e2[%u]=%u, map_cc2count_e3[%u]=%u, ", i, stats[i].map_cc2count_e2[j].size(), j, stats[i].map_cc2count_e3[j].size());
-            double interrupt_rate = (double)stats[i].map_cc2count_e2[j].size() / (stats[i].map_cc2count_e3[j].size()+1);
-            printf("interrupt_rate%u=%f\n", j, interrupt_rate);
-            s_fout_buffer << " interrupt_rate" << j << "=" << interrupt_rate;
-        }
+			for (size_t j = 0; j < MAP_CC2COUNT_COUNT; ++j) {
+				//printf("[WARN] map_cc2count_e2[%u][0]=%u, map_cc2count_e3[%u][0]=%u\n", j, bundle.map_cc2count_e2[j][0], j, bundle.map_cc2count_e3[j][0]);
+				printf("cc2count_e2[%u]=%u, map_cc2count_e3[%u]=%u, ", j, bundle.map_cc2count_e2[j].size(), j, bundle.map_cc2count_e3[j].size());
+				double interrupt_rate = (bundle.map_cc2count_e3[j].size()==0 ? 0 : (double)bundle.map_cc2count_e2[j].size() / bundle.map_cc2count_e3[j].size());
+				s_fout_buffer << " " << (j==0 ? "interrupt_rate" : "t_interrupt_rate") << "=" << interrupt_rate;
+				printf("interrupt_rate%u=%f\n", j, interrupt_rate);
+			}
 
-        double playspeed = stats[i].playspeed_value_count / (stats[i].playspeed_count+1);
-        printf("playspeed_count=%u, playspeed_value_count=%f, playspeed=%f\n",
-               stats[i].playspeed_count, stats[i].playspeed_value_count, playspeed);
-        printf("playspeed distribution:");
-        for (size_t j = 0; j < SPEED_DIST_COUNT; ++j) {
-            printf(" [%u-%u)(%u)", j*100, j*100+100, stats[i].speed_dist[j]);
-        }
-        printf("\n");
-        s_fout_buffer << " playspeed=" << playspeed;
+			double playspeed = (bundle.playspeed_count==0 ? 0 : bundle.playspeed_sum/bundle.playspeed_count);
+			printf("playspeed_count=%u, playspeed_sum=%f, playspeed=%f\n",
+				   bundle.playspeed_count, bundle.playspeed_sum, playspeed);
+			printf("playspeed distribution:");
+			for (size_t j = 0; j < SPEED_DIST_COUNT; ++j) {
+				printf(" [%u-%u)(%u)", j*100, j*100+100, bundle.speed_dist[j]);
+			}
+			printf("\n");
+			s_fout_buffer << " playspeed=" << playspeed;
 
-        double trialPlayspeed = stats[i].t_playspeed_value_count / (stats[i].t_playspeed_count+1);
-        printf("trialPlayspeed_count=%u, trialPlayspeed_value_count=%f, trialPlayspeed=%f\n",
-               stats[i].t_playspeed_count, stats[i].t_playspeed_value_count, trialPlayspeed);
-        printf("trialPlayspeed distribution:");
-        for (size_t j = 0; j < SPEED_DIST_COUNT; ++j) {
-            printf(" [%u-%u)(%u)", j*100, j*100+100, stats[i].t_speed_dist[j]);
+			double trialPlayspeed = (bundle.t_playspeed_count==0 ? 0 : bundle.t_playspeed_sum/bundle.t_playspeed_count);
+			printf("trialPlayspeed_count=%u, trialPlayspeed_value_count=%f, trialPlayspeed=%f\n",
+				   bundle.t_playspeed_count, bundle.t_playspeed_sum, trialPlayspeed);
+			printf("trialPlayspeed distribution:");
+			for (size_t j = 0; j < SPEED_DIST_COUNT; ++j) {
+				printf(" [%u-%u)(%u)", j*100, j*100+100, bundle.t_speed_dist[j]);
+			}
+			printf("\n");
+			s_fout_buffer << " trialPlayspeed=" << trialPlayspeed << "\n";
+			printf("=============================================\n");
         }
-        printf("\n");
-        s_fout_buffer << " trialPlayspeed=" << trialPlayspeed << "\n";
-        printf("=============================================\n");
     }
 }
 
@@ -563,23 +614,26 @@ int stat_all_func(int argc, char* argv[]) {
 		return -1;
     }
     //std::string time = argv[1];
-    vector<stat_data_bundle> stat_datas;
+    vector<v_stat_data_bundle> stat_datas;
     stat_datas.resize(argc-2);
     for (size_t i = 0; i < stat_datas.size(); ++i) {
-        stat_datas[i].time = argv[1];
-        stat_datas[i].machine = argv[i + 2];
-        stat_datas[i].first_buffer_trial_count = 0;
-        stat_datas[i].first_buffer_normal_count = 0;
-        stat_datas[i].trial_count = 0;
-        stat_datas[i].normal_count = 0;
-        stat_datas[i].playspeed_value_count = 0;
-        stat_datas[i].playspeed_count = 0;
-        stat_datas[i].t_playspeed_value_count = 0;
-        stat_datas[i].t_playspeed_count = 0;
-        memset(&stat_datas[i].firstbuffer_dist, 0, sizeof(stat_datas[i].firstbuffer_dist));
-        memset(&stat_datas[i].t_firstbuffer_dist, 0, sizeof(stat_datas[i].t_firstbuffer_dist));
-        memset(&stat_datas[i].speed_dist, 0, sizeof(stat_datas[i].speed_dist));
-        memset(&stat_datas[i].t_speed_dist, 0, sizeof(stat_datas[i].t_speed_dist));
+        stat_datas[i].resize(VDM_COUNT);
+        for (size_t j = 0; j < VDM_COUNT; ++j) {
+            stat_datas[i][j].time = argv[1];
+            stat_datas[i][j].machine = argv[i + 2];
+            stat_datas[i][j].t_firstbuffer_sum = 0;
+            stat_datas[i][j].firstbuffer_sum = 0;
+            stat_datas[i][j].t_firstbuffer_count = 0;
+            stat_datas[i][j].firstbuffer_count = 0;
+            stat_datas[i][j].playspeed_sum = 0;
+            stat_datas[i][j].playspeed_count = 0;
+            stat_datas[i][j].t_playspeed_sum = 0;
+            stat_datas[i][j].t_playspeed_count = 0;
+            memset(&stat_datas[i][j].firstbuffer_dist, 0, sizeof(stat_datas[i][j].firstbuffer_dist));
+            memset(&stat_datas[i][j].t_firstbuffer_dist, 0, sizeof(stat_datas[i][j].t_firstbuffer_dist));
+            memset(&stat_datas[i][j].speed_dist, 0, sizeof(stat_datas[i][j].speed_dist));
+            memset(&stat_datas[i][j].t_speed_dist, 0, sizeof(stat_datas[i][j].t_speed_dist));
+        }
     }
 //    const size_t FILE_COUNT = 24;
 //    const std::string TIME_FILENAME_PREFIX = "vod_stat.log.";
@@ -606,15 +660,15 @@ int tool_trait_stat_values(int argc, char* argv[]) {
     vector<string> t_interrupt_values;
     vector<string> playspeed_values;
     vector<string> t_playspeed_values;
-	const std::string FIRST_BUFFER_FLAG = "first_buffer_normal=";
-	const std::string T_FIRST_BUFFER_FLAG = "first_buffer_trial=";
+	const std::string FUNC_FLAG_FIRST_BUFFER = "firstbuffer=";
+	const std::string T_FUNC_FLAG_FIRST_BUFFER = "t_firstbuffer=";
 	const std::string INTERRUPT_RATE_FLAG = "interrupt_rate0=";
 	const std::string T_INTERRUPT_RATE_FLAG = "interrupt_rate1=";
-	const std::string PLAYSPEED_FLAG = "playspeed=";
-	const std::string T_PLAYSPEED_FLAG = "trialPlayspeed=";
+	const std::string FUNC_FLAG_PLAYSPEED = "playspeed=";
+	const std::string T_FUNC_FLAG_PLAYSPEED = "trialPlayspeed=";
 	const std::string SPLIT_FLAG = " ";
 	vector<string>* stat_values_array[TRAIT_STAT_FIELD_COUNT] = {&firstbuffer_values, &t_firstbuffer_values, &interrupt_values, &t_interrupt_values, &playspeed_values, &t_playspeed_values};
-	const std::string* stat_values_flag_array[TRAIT_STAT_FIELD_COUNT] = {&FIRST_BUFFER_FLAG, &T_FIRST_BUFFER_FLAG, &INTERRUPT_RATE_FLAG, &T_INTERRUPT_RATE_FLAG, &PLAYSPEED_FLAG, &T_PLAYSPEED_FLAG};
+	const std::string* stat_values_flag_array[TRAIT_STAT_FIELD_COUNT] = {&FUNC_FLAG_FIRST_BUFFER, &T_FUNC_FLAG_FIRST_BUFFER, &INTERRUPT_RATE_FLAG, &T_INTERRUPT_RATE_FLAG, &FUNC_FLAG_PLAYSPEED, &T_FUNC_FLAG_PLAYSPEED};
     if (argc < 2) {
 		cerr << "Parameters error.\n" << endl;
 		cerr << "Usage: trait_stat_values.exe [in_file] [out_file](defaule './trait_stat_values_result.txt'). \n" << endl;
