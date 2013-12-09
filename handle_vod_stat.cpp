@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+//#include <hash_map>
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -15,7 +16,23 @@
 //#include <Windows.h>
 
 using namespace std;
-
+//using namespace __gnu_cxx;
+//
+//namespace __gnu_cxx
+//{
+//    template<> struct hash<const string>
+//    {
+//        size_t operator()(const string& s) const
+//        { return hash<const char*>()( s.c_str() ); } //__stl_hash_string
+//    };
+//    template<> struct hash<string>
+//    {
+//        size_t operator()(const string& s) const
+//        { return hash<const char*>()( s.c_str() ); }
+//    };
+//}
+//typedef __gnu_cxx::hash_map<std::string, int> map_machine2index;
+typedef map<std::string, int> map_machine2index;
 static std::ofstream s_fout("stat_result.log", ios::app);
 //static std::string s_fout_buffer;
 static std::ostringstream s_fout_buffer;
@@ -374,44 +391,82 @@ int stat_single_func(int argc, char* argv[])
 }
 
 
-int index_of_machine(int func_num, const vector<v_stat_data_bundle>& stats, const string& buffer, size_t find_offset = 0)
+//int index_of_machine(int func_num, const vector<v_stat_data_bundle>& stats, const string& buffer, size_t find_offset = 0)
+int index_of_machine(int func_num, const map_machine2index& machines, const string& buffer, size_t find_offset = 0)
 {
+    // TODO 优化下面查找逻辑.
+    // 机房IP用hash_set数据结构保持，提高查询效率。
+    size_t find_pos, next_split_pos;
     if (func_num == 0)
     {
-        for (size_t i = 0; i < stats.size(); ++i)
-        {
-            const string flag = "vod=" + stats[i][0].machine;
-            if (buffer.find(flag, find_offset) != string::npos)
-                return i;
+//        for (size_t i = 0; i < stats.size(); ++i)
+//        {
+//            const string flag = "vod=" + stats[i][0].machine;
+//            if (buffer.find(flag, find_offset) != string::npos)
+//                return i;
+//        }
+        const string FLAG = "&vod=";
+        const string SPLIT_FLAG = "&";
+        find_pos = buffer.find(FLAG, find_offset);
+        if (find_pos != string::npos) {
+            find_pos += FLAG.size();
+            next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
+            const string ip_str = buffer.substr(find_pos, next_split_pos-find_pos);
+            map_machine2index::const_iterator it = machines.find(ip_str);
+            if (it != machines.end()) {
+                return it->second;
+            }
         }
     }
     else if (func_num == 1)
     {
-        for (size_t i = 0; i < stats.size(); ++i)
-        {
-            const string flag = "vod=" + stats[i][0].machine;
-            if (buffer.find(flag, find_offset) != string::npos)
-                return i;
+        const string FLAG = "&vod=";
+        const string SPLIT_FLAG = "&";
+        find_pos = buffer.find(FLAG, find_offset);
+        if (find_pos != string::npos) {
+            find_pos += FLAG.size();
+            next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
+            const string ip_str = buffer.substr(find_pos, next_split_pos-find_pos);
+            map_machine2index::const_iterator it = machines.find(ip_str);
+            if (it != machines.end()) {
+                return it->second;
+            }
         }
-
     }
     else if (func_num == 2)
     {
-        for (size_t i = 0; i < stats.size(); ++i)
-        {
-            const string flag = stats[i][0].machine;//"vod_ip=" +
-            if (buffer.find(flag, find_offset) != string::npos)
-                return i;
+//        for (size_t i = 0; i < stats.size(); ++i)
+//        {
+//            const string flag = stats[i][0].machine;//"vod_ip=" +
+//            if (buffer.find(flag, find_offset) != string::npos)
+//                return i;
+//        }
+        const string FLAG = "&vod_ip=";
+        const string SPLIT_FLAG = "&";
+        find_pos = buffer.find(FLAG, find_offset);
+        if (find_pos != string::npos) {
+            find_pos += FLAG.size();
+            next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
+            const string ip_str = buffer.substr(find_pos, next_split_pos-find_pos);
+            map_machine2index::const_iterator it = machines.find(ip_str);
+            if (it != machines.end()) {
+                return it->second;
+            }
         }
-
     }
     else if (func_num == 3)
     {
-        for (size_t i = 0; i < stats.size(); ++i)
-        {
-            const string flag = stats[i][0].machine;//"vod_ip=" +
-            if (buffer.find(flag, find_offset) != string::npos)
-                return i;
+        const string FLAG = "&vod_ip=";
+        const string SPLIT_FLAG = "&";
+        find_pos = buffer.find(FLAG, find_offset);
+        if (find_pos != string::npos) {
+            find_pos += FLAG.size();
+            next_split_pos = buffer.find(SPLIT_FLAG, find_pos);
+            const string ip_str = buffer.substr(find_pos, next_split_pos-find_pos);
+            map_machine2index::const_iterator it = machines.find(ip_str);
+            if (it != machines.end()) {
+                return it->second;
+            }
         }
     }
     //assert(false);
@@ -438,6 +493,11 @@ void stat_all_func(vector<v_stat_data_bundle>& stats)
     const std::string ARG_FLAG_TRIAL_PLAYSPEED_VAULE = "&s=";
     const std::string FUNC_FLAG = "&f=";
     const std::string VOD_DOWNLOAD_MODE_FLAG = "&vdm=";
+    map_machine2index map_machine2index_stat;
+    for (size_t i = 0; i < stats.size(); ++i) {
+        map_machine2index_stat[stats[i][0].machine] = i;
+
+    }
 
     int start_tick_count = GetTickCount();
     while (getline(std::cin, buffer))
@@ -461,7 +521,7 @@ void stat_all_func(vector<v_stat_data_bundle>& stats)
         size_t next_split_pos;
         if (func_value == FUNC_FLAG_FIRST_BUFFER)
         {
-            int index = index_of_machine(0, stats, buffer, find_pos);
+            int index = index_of_machine(0, map_machine2index_stat, buffer, find_pos);
             if (index == -1)
             {
                 continue;
@@ -517,7 +577,7 @@ void stat_all_func(vector<v_stat_data_bundle>& stats)
         }
         else if (func_value == FUNC_FLAG_BUFFER)
         {
-            int index = index_of_machine(1, stats, buffer, find_pos);
+            int index = index_of_machine(1, map_machine2index_stat, buffer, find_pos);
             if (index == -1)
             {
                 continue;
@@ -601,13 +661,14 @@ void stat_all_func(vector<v_stat_data_bundle>& stats)
                 }
                 else
                 {
+                    printf("[WARNING] cc_value=%s, buffer=%s\n", cc_value.c_str(), buffer.c_str());
                     continue;
                 }
             }
         }
         else if (func_value == FUNC_FLAG_PLAYSPEED)
         {
-            int index = index_of_machine(2, stats, buffer, find_pos);
+            int index = index_of_machine(2, map_machine2index_stat, buffer, find_pos);
             if (index == -1)
             {
                 continue;
@@ -643,7 +704,7 @@ void stat_all_func(vector<v_stat_data_bundle>& stats)
         }
         else if (func_value == FUNC_FLAG_TRIAL_PLAYSPEED)
         {
-            int index = index_of_machine(3, stats, buffer, find_pos);
+            int index = index_of_machine(3, map_machine2index_stat, buffer, find_pos);
             if (index == -1)
             {
                 continue;
@@ -804,8 +865,8 @@ int tool_trait_stat_values(int argc, char* argv[])
     vector<string> t_playspeed_values;
     const std::string FUNC_FLAG_FIRST_BUFFER = "firstbuffer=";
     const std::string T_FUNC_FLAG_FIRST_BUFFER = "t_firstbuffer=";
-    const std::string INTERRUPT_RATE_FLAG = "interrupt_rate0=";
-    const std::string T_INTERRUPT_RATE_FLAG = "interrupt_rate1=";
+    const std::string INTERRUPT_RATE_FLAG = "interrupt_rate=";
+    const std::string T_INTERRUPT_RATE_FLAG = "t_interrupt_rate=";
     const std::string FUNC_FLAG_PLAYSPEED = "playspeed=";
     const std::string T_FUNC_FLAG_PLAYSPEED = "trialPlayspeed=";
     const std::string SPLIT_FLAG = " ";
