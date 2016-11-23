@@ -4,15 +4,21 @@
 ** author:        junkun huang
 ** e-mail:        huangjunkun@gmail.com
 ** Declare: 
-  该git工程存放，工程性的工具代码，或工作时项目开发前期测试性代码。
+  该git工程存放，工程性的工具代码，或项目预研性质的测试性代码。
   每一份源码均有一段简要的说明，详见如下内容。欢迎交流，谢谢！
+
+  ## 14.
+/**
+** 源文件： stat_func_list.h stat_func_list.cpp
+   统计功能集合，包括：
+    1. stat_uuid_rate -- 统计uuid占比情况
+*/
 
   ## 13.
 /**
 ** 源文件： handle_vod_stat.cpp
-   vod.xunlei.com统计数据分析处理，分析因素包括首缓冲、中断率、平均速度。
-
-
+   vod.xxxxxx.com云点播（云播）统计数据分析处理，分析因素包括首缓冲、中断率、平均速度。
+*/
   ## 12.
 /**
 ** 源文件： range_func_test.c
